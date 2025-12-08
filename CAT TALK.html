@@ -1,0 +1,3168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CAT TALKIE - Live Video Social Platform</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto+Slab:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Add Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        :root {
+            --primary-color: #FF6B8B;
+            --secondary-color: #00D4FF;
+            --accent-color: #FFD166;
+            --dark-color: #0F0F1E;
+            --darker-color: #0A0A14;
+            --light-color: #FFFFFF;
+            --gray-color: #8A8A9E;
+            --card-bg: #1A1A2E;
+            --success-color: #4CAF50;
+            --live-color: #FF0000;
+        }
+        
+        body {
+            background-color: var(--dark-color);
+            color: var(--light-color);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            max-width: 100vw;
+        }
+        
+        /* Header */
+        .header {
+            background-color: var(--darker-color);
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-family: 'Roboto Slab', serif;
+            letter-spacing: 1px;
+        }
+        
+        .logo-subtitle {
+            font-size: 10px;
+            color: var(--gray-color);
+            margin-left: 5px;
+            font-weight: 300;
+        }
+        
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .search-container {
+            display: flex;
+            align-items: center;
+            background-color: var(--card-bg);
+            border-radius: 50px;
+            padding: 8px 15px;
+            width: 200px;
+        }
+        
+        .search-container input {
+            background: transparent;
+            border: none;
+            color: var(--light-color);
+            margin-left: 8px;
+            width: 100%;
+            outline: none;
+            font-size: 14px;
+        }
+        
+        .notification-btn, .message-btn {
+            background: none;
+            border: none;
+            color: var(--light-color);
+            font-size: 20px;
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: var(--live-color);
+            color: white;
+            font-size: 10px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--primary-color);
+            cursor: pointer;
+        }
+        
+        /* Main Content Area */
+        .main-content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+        
+        /* Sidebar Navigation */
+        .sidebar {
+            width: 80px;
+            background-color: var(--darker-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 0;
+            transition: all 0.3s;
+            position: fixed;
+            height: calc(100vh - 64px);
+            z-index: 900;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 15px 0;
+            width: 100%;
+            color: var(--gray-color);
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+        
+        .nav-item.active {
+            color: var(--primary-color);
+            border-right: 3px solid var(--primary-color);
+            background-color: rgba(255, 107, 139, 0.1);
+        }
+        
+        .nav-item:hover {
+            color: var(--light-color);
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        
+        .nav-icon {
+            font-size: 22px;
+            margin-bottom: 5px;
+        }
+        
+        .nav-text {
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        /* Content Pages */
+        .content-area {
+            flex: 1;
+            margin-left: 80px;
+            padding: 20px;
+            overflow-y: auto;
+            height: calc(100vh - 64px);
+            transition: all 0.3s;
+        }
+        
+        .page {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Tab Navigation within pages */
+        .tab-navigation {
+            display: flex;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        
+        .tab-navigation::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .tab-button {
+            padding: 12px 20px;
+            background: none;
+            border: none;
+            color: var(--gray-color);
+            font-weight: 500;
+            cursor: pointer;
+            white-space: nowrap;
+            position: relative;
+            transition: all 0.3s;
+        }
+        
+        .tab-button:hover {
+            color: var(--light-color);
+        }
+        
+        .tab-button.active {
+            color: var(--primary-color);
+        }
+        
+        .tab-button.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: var(--primary-color);
+            border-radius: 3px 3px 0 0;
+        }
+        
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Home Page - Video Feed */
+        .video-feed-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 500px;
+            margin: 0 auto;
+            padding-bottom: 80px;
+        }
+        
+        .video-card {
+            width: 100%;
+            max-width: 450px;
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+        
+        .video-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .video-user {
+            display: flex;
+            align-items: center;
+        }
+        
+        .user-avatar-small {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 10px;
+            border: 2px solid var(--secondary-color);
+        }
+        
+        .user-info h4 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+        
+        .user-info span {
+            font-size: 12px;
+            color: var(--gray-color);
+        }
+        
+        .follow-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 6px 15px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .follow-btn:hover {
+            background-color: #ff4d73;
+        }
+        
+        .follow-btn.following {
+            background-color: transparent;
+            border: 1px solid var(--gray-color);
+            color: var(--gray-color);
+        }
+        
+        .video-player {
+            width: 100%;
+            height: 500px;
+            background-color: #000;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .video-player video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .video-controls {
+            position: absolute;
+            bottom: 10px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            z-index: 10;
+        }
+        
+        .video-control-btn {
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .video-control-btn:hover {
+            background-color: rgba(0, 0, 0, 0.8);
+            transform: scale(1.1);
+        }
+        
+        .video-stats {
+            padding: 15px;
+        }
+        
+        .video-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+        
+        .video-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .tag {
+            background-color: rgba(255, 107, 139, 0.2);
+            color: var(--primary-color);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .tag:hover {
+            background-color: rgba(255, 107, 139, 0.3);
+        }
+        
+        .engagement-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .engagement-buttons {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .engagement-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: none;
+            border: none;
+            color: var(--light-color);
+            cursor: pointer;
+            font-size: 24px;
+            transition: all 0.3s;
+            padding: 5px;
+        }
+        
+        .engagement-btn span {
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        
+        .engagement-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        .engagement-btn.liked {
+            color: var(--primary-color);
+        }
+        
+        .view-count {
+            color: var(--gray-color);
+            font-size: 14px;
+        }
+        
+        /* Discover Page */
+        .discover-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .category-card {
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .category-image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+        
+        .category-info {
+            padding: 15px;
+        }
+        
+        .category-name {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .category-stats {
+            display: flex;
+            justify-content: space-between;
+            color: var(--gray-color);
+            font-size: 14px;
+        }
+        
+        /* Create Page */
+        .create-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .create-options {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .create-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            padding: 20px;
+            width: 150px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        
+        .create-option:hover {
+            transform: scale(1.05);
+            background-color: rgba(255, 107, 139, 0.1);
+        }
+        
+        .create-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+            color: var(--secondary-color);
+        }
+        
+        .upload-area {
+            border: 2px dashed var(--gray-color);
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            width: 100%;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .upload-area:hover {
+            border-color: var(--primary-color);
+            background-color: rgba(255, 107, 139, 0.05);
+        }
+        
+        /* Live Page */
+        .live-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .live-stream {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .live-player {
+            width: 100%;
+            max-width: 700px;
+            background-color: #000;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 20px;
+        }
+        
+        .live-indicator {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background-color: var(--live-color);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            z-index: 10;
+        }
+        
+        .live-viewers {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            z-index: 10;
+        }
+        
+        .live-chat {
+            width: 100%;
+            max-width: 700px;
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            overflow: hidden;
+        }
+        
+        .chat-header {
+            padding: 15px;
+            background-color: rgba(0, 0, 0, 0.2);
+            font-weight: 600;
+        }
+        
+        .chat-messages {
+            height: 300px;
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .chat-message {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: flex-start;
+            animation: slideIn 0.3s;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .chat-user {
+            font-weight: 600;
+            margin-right: 8px;
+            color: var(--secondary-color);
+        }
+        
+        .chat-text {
+            flex: 1;
+        }
+        
+        .chat-input-container {
+            display: flex;
+            padding: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .chat-input {
+            flex: 1;
+            background-color: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 20px;
+            padding: 10px 15px;
+            color: white;
+            margin-right: 10px;
+        }
+        
+        .chat-send-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .chat-send-btn:hover {
+            background-color: #ff4d73;
+        }
+        
+        /* Inbox Page */
+        .inbox-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .conversations-list {
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            overflow: hidden;
+        }
+        
+        .conversation-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .conversation-item:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        
+        .conversation-item.unread {
+            background-color: rgba(0, 212, 255, 0.05);
+        }
+        
+        .conversation-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 15px;
+            border: 2px solid var(--secondary-color);
+        }
+        
+        .conversation-info {
+            flex: 1;
+        }
+        
+        .conversation-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .conversation-last-message {
+            color: var(--gray-color);
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 200px;
+        }
+        
+        .conversation-time {
+            font-size: 12px;
+            color: var(--gray-color);
+        }
+        
+        /* Profile Page */
+        .profile-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .profile-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: var(--card-bg);
+            border-radius: 15px;
+        }
+        
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid var(--primary-color);
+            margin-right: 25px;
+            cursor: pointer;
+        }
+        
+        .profile-info h2 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        
+        .profile-username {
+            color: var(--gray-color);
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        
+        .profile-bio {
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        
+        .profile-stats {
+            display: flex;
+            gap: 30px;
+        }
+        
+        .stat {
+            text-align: center;
+            cursor: pointer;
+        }
+        
+        .stat:hover .stat-number {
+            color: var(--secondary-color);
+        }
+        
+        .stat-number {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary-color);
+            transition: all 0.3s;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: var(--gray-color);
+        }
+        
+        .profile-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .profile-btn {
+            padding: 8px 20px;
+            border-radius: 20px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .edit-profile-btn {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .edit-profile-btn:hover {
+            background-color: #ff4d73;
+        }
+        
+        .share-profile-btn {
+            background-color: transparent;
+            color: var(--light-color);
+            border: 1px solid var(--gray-color);
+        }
+        
+        .share-profile-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .profile-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        /* Notifications Page */
+        .notifications-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .notification-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .notification-item:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        
+        .notification-item.unread {
+            background-color: rgba(0, 212, 255, 0.1);
+        }
+        
+        .notification-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 18px;
+        }
+        
+        .notification-icon.like {
+            background-color: rgba(255, 107, 139, 0.2);
+            color: var(--primary-color);
+        }
+        
+        .notification-icon.comment {
+            background-color: rgba(0, 212, 255, 0.2);
+            color: var(--secondary-color);
+        }
+        
+        .notification-icon.follow {
+            background-color: rgba(255, 209, 102, 0.2);
+            color: var(--accent-color);
+        }
+        
+        .notification-content {
+            flex: 1;
+        }
+        
+        .notification-text {
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        
+        .notification-time {
+            font-size: 12px;
+            color: var(--gray-color);
+        }
+        
+        /* Search Page */
+        .search-container-page {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .search-results {
+            margin-top: 20px;
+        }
+        
+        .result-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .result-item:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        
+        .result-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 15px;
+            border: 2px solid var(--secondary-color);
+        }
+        
+        .result-info {
+            flex: 1;
+        }
+        
+        .result-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .result-username {
+            color: var(--gray-color);
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        
+        .result-stats {
+            font-size: 12px;
+            color: var(--gray-color);
+        }
+        
+        /* Authentication Modal */
+        .auth-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.95);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            animation: fadeIn 0.3s;
+        }
+        
+        .auth-modal.active {
+            display: flex;
+        }
+        
+        .auth-container {
+            background-color: var(--card-bg);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 400px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            animation: modalAppear 0.4s;
+        }
+        
+        @keyframes modalAppear {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        
+        .auth-tabs {
+            display: flex;
+            background-color: var(--darker-color);
+        }
+        
+        .auth-tab {
+            flex: 1;
+            text-align: center;
+            padding: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .auth-tab.active {
+            background-color: var(--primary-color);
+        }
+        
+        .auth-form {
+            padding: 30px;
+        }
+        
+        .auth-form h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 24px;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: var(--light-color);
+            font-size: 14px;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+        
+        .auth-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+        
+        .auth-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 139, 0.4);
+        }
+        
+        .auth-footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: var(--gray-color);
+        }
+        
+        /* Mobile Bottom Navigation */
+        .mobile-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--darker-color);
+            padding: 10px 0;
+            z-index: 1000;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .mobile-nav-items {
+            display: flex;
+            justify-content: space-around;
+        }
+        
+        .mobile-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--gray-color);
+            text-decoration: none;
+            padding: 5px;
+            transition: all 0.3s;
+        }
+        
+        .mobile-nav-item.active {
+            color: var(--primary-color);
+        }
+        
+        .mobile-nav-item:hover {
+            color: var(--light-color);
+        }
+        
+        .mobile-nav-icon {
+            font-size: 20px;
+            margin-bottom: 3px;
+        }
+        
+        .mobile-nav-text {
+            font-size: 10px;
+        }
+        
+        /* Floating Action Button */
+        .fab {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            z-index: 100;
+            transition: all 0.3s;
+        }
+        
+        .fab:hover {
+            transform: scale(1.1);
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+            
+            .content-area {
+                margin-left: 0;
+                padding: 15px;
+                padding-bottom: 70px;
+            }
+            
+            .mobile-nav {
+                display: block;
+            }
+            
+            .header-actions {
+                gap: 10px;
+            }
+            
+            .search-container {
+                width: 40px;
+                padding: 8px;
+                justify-content: center;
+            }
+            
+            .search-container input {
+                display: none;
+            }
+            
+            .video-player {
+                height: 400px;
+            }
+            
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .profile-avatar {
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+            
+            .discover-container {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .video-player {
+                height: 300px;
+            }
+            
+            .discover-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .profile-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .header {
+                padding: 10px 15px;
+            }
+            
+            .logo {
+                font-size: 24px;
+            }
+            
+            .create-options {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .tab-navigation {
+                padding-bottom: 5px;
+            }
+            
+            .tab-button {
+                padding: 10px 15px;
+                font-size: 14px;
+            }
+        }
+        
+        /* Creator Badge */
+        .creator-badge {
+            background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+            color: white;
+            font-size: 10px;
+            padding: 3px 8px;
+            border-radius: 10px;
+            margin-left: 5px;
+            display: inline-block;
+        }
+        
+        /* App Footer */
+        .app-footer {
+            text-align: center;
+            padding: 20px;
+            color: var(--gray-color);
+            font-size: 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            background-color: var(--darker-color);
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        
+        .footer-links a {
+            color: var(--gray-color);
+            text-decoration: none;
+            font-size: 12px;
+        }
+        
+        .footer-links a:hover {
+            color: var(--primary-color);
+        }
+        
+        .creator-credit {
+            font-size: 10px;
+            color: var(--accent-color);
+            margin-top: 5px;
+        }
+        
+        /* Loading Spinner */
+        .loading-spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo-container">
+                <div class="logo">CAT TALKIE</div>
+                <div class="logo-subtitle">by CAT PHOENIX</div>
+            </div>
+            
+            <div class="header-actions">
+                <div class="search-container" id="openSearch">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search videos, creators...">
+                </div>
+                <button class="notification-btn" id="openNotifications">
+                    <i class="far fa-bell"></i>
+                    <span class="notification-badge">3</span>
+                </button>
+                <button class="message-btn" id="openMessages">
+                    <i class="far fa-envelope"></i>
+                    <span class="notification-badge">5</span>
+                </button>
+                <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="User" class="user-avatar" id="userAvatar">
+            </div>
+        </header>
+        
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <!-- Desktop Sidebar -->
+            <nav class="sidebar">
+                <a href="#" class="nav-item active" data-page="home">
+                    <i class="fas fa-home nav-icon"></i>
+                    <span class="nav-text">Home</span>
+                </a>
+                <a href="#" class="nav-item" data-page="discover">
+                    <i class="fas fa-compass nav-icon"></i>
+                    <span class="nav-text">Discover</span>
+                </a>
+                <a href="#" class="nav-item" data-page="create">
+                    <i class="fas fa-plus-circle nav-icon"></i>
+                    <span class="nav-text">Create</span>
+                </a>
+                <a href="#" class="nav-item" data-page="live">
+                    <i class="fas fa-broadcast-tower nav-icon"></i>
+                    <span class="nav-text">Live</span>
+                </a>
+                <a href="#" class="nav-item" data-page="inbox">
+                    <i class="fas fa-inbox nav-icon"></i>
+                    <span class="nav-text">Inbox</span>
+                </a>
+                <a href="#" class="nav-item" data-page="profile">
+                    <i class="fas fa-user nav-icon"></i>
+                    <span class="nav-text">Profile</span>
+                </a>
+            </nav>
+            
+            <!-- Content Pages -->
+            <div class="content-area">
+                <!-- Home Page -->
+                <div class="page active" id="home-page">
+                    <div class="tab-navigation">
+                        <button class="tab-button active" data-tab="for-you">For You</button>
+                        <button class="tab-button" data-tab="following">Following</button>
+                        <button class="tab-button" data-tab="trending">Trending</button>
+                        <button class="tab-button" data-tab="new">New</button>
+                    </div>
+                    
+                    <div class="tab-content active" id="for-you-tab">
+                        <div class="video-feed-container">
+                            <!-- Video cards will be loaded here -->
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="following-tab">
+                        <div class="video-feed-container">
+                            <!-- Following videos will be loaded here -->
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="trending-tab">
+                        <div class="video-feed-container">
+                            <!-- Trending videos will be loaded here -->
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="new-tab">
+                        <div class="video-feed-container">
+                            <!-- New videos will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Discover Page -->
+                <div class="page" id="discover-page">
+                    <div class="tab-navigation">
+                        <button class="tab-button active" data-tab="categories">Categories</button>
+                        <button class="tab-button" data-tab="trending-sounds">Trending Sounds</button>
+                        <button class="tab-button" data-tab="creators">Top Creators</button>
+                        <button class="tab-button" data-tab="hashtags">Hashtags</button>
+                    </div>
+                    
+                    <div class="tab-content active" id="categories-tab">
+                        <div class="discover-container">
+                            <!-- Categories will be loaded here -->
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="trending-sounds-tab">
+                        <div class="discover-container">
+                            <!-- Trending sounds will be loaded here -->
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="creators-tab">
+                        <div class="discover-container">
+                            <!-- Top creators will be loaded here -->
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="hashtags-tab">
+                        <div class="discover-container">
+                            <!-- Hashtags will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Create Page -->
+                <div class="page" id="create-page">
+                    <div class="tab-navigation">
+                        <button class="tab-button active" data-tab="upload">Upload Video</button>
+                        <button class="tab-button" data-tab="go-live">Go Live</button>
+                        <button class="tab-button" data-tab="story">Create Story</button>
+                        <button class="tab-button" data-tab="drafts">Drafts</button>
+                    </div>
+                    
+                    <div class="tab-content active" id="upload-tab">
+                        <div class="create-container">
+                            <div class="upload-area" id="uploadTrigger">
+                                <i class="fas fa-cloud-upload-alt" style="font-size: 50px; margin-bottom: 15px; color: var(--secondary-color);"></i>
+                                <h3>Drag and drop your video here</h3>
+                                <p>or click to browse files</p>
+                                <p style="font-size: 12px; margin-top: 10px; color: var(--gray-color);">MP4, MOV, AVI up to 10 minutes • 1080p recommended</p>
+                            </div>
+                            
+                            <div id="uploadForm" style="width: 100%; display: none;">
+                                <div class="form-group">
+                                    <label for="videoTitle">Video Title</label>
+                                    <input type="text" id="videoTitle" class="form-control" placeholder="Enter a catchy title for your video">
+                                </div>
+                                <div class="form-group">
+                                    <label for="videoDescription">Description</label>
+                                    <textarea id="videoDescription" class="form-control" rows="3" placeholder="Describe your video"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="videoTags">Tags (separate with commas)</label>
+                                    <input type="text" id="videoTags" class="form-control" placeholder="dance, fun, tutorial, music">
+                                </div>
+                                <button class="auth-btn" id="submitVideo">Upload Video</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="go-live-tab">
+                        <div class="create-container">
+                            <h3 style="text-align: center; margin-bottom: 30px;">Go Live on CAT TALKIE</h3>
+                            <div class="create-options">
+                                <div class="create-option" id="startLive">
+                                    <i class="fas fa-broadcast-tower create-icon"></i>
+                                    <span>Start Live Stream</span>
+                                    <p style="font-size: 12px; color: var(--gray-color); margin-top: 10px;">Go live instantly</p>
+                                </div>
+                                <div class="create-option" id="scheduleLive">
+                                    <i class="fas fa-calendar-alt create-icon"></i>
+                                    <span>Schedule Live</span>
+                                    <p style="font-size: 12px; color: var(--gray-color); margin-top: 10px;">Schedule for later</p>
+                                </div>
+                            </div>
+                            
+                            <div id="liveSetup" style="width: 100%; display: none; margin-top: 30px;">
+                                <div class="form-group">
+                                    <label for="liveTitle">Live Stream Title</label>
+                                    <input type="text" id="liveTitle" class="form-control" placeholder="What are you streaming about?">
+                                </div>
+                                <div class="form-group">
+                                    <label for="liveCategory">Category</label>
+                                    <select id="liveCategory" class="form-control">
+                                        <option value="gaming">Gaming</option>
+                                        <option value="music">Music</option>
+                                        <option value="talk">Talk Show</option>
+                                        <option value="education">Education</option>
+                                        <option value="entertainment">Entertainment</option>
+                                    </select>
+                                </div>
+                                <button class="auth-btn" id="startLiveBtn">Go Live Now</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="story-tab">
+                        <div class="create-container">
+                            <h3 style="text-align: center; margin-bottom: 30px;">Create a Story</h3>
+                            <div class="create-options">
+                                <div class="create-option" id="cameraStory">
+                                    <i class="fas fa-camera create-icon"></i>
+                                    <span>Use Camera</span>
+                                </div>
+                                <div class="create-option" id="uploadStory">
+                                    <i class="fas fa-upload create-icon"></i>
+                                    <span>Upload Photo/Video</span>
+                                </div>
+                                <div class="create-option" id="textStory">
+                                    <i class="fas fa-font create-icon"></i>
+                                    <span>Text Story</span>
+                                </div>
+                            </div>
+                            
+                            <div id="storyEditor" style="width: 100%; display: none; margin-top: 30px;">
+                                <div class="form-group">
+                                    <label for="storyText">Story Text</label>
+                                    <input type="text" id="storyText" class="form-control" placeholder="What's happening?">
+                                </div>
+                                <div class="form-group">
+                                    <label for="storyBackground">Background Color</label>
+                                    <input type="color" id="storyBackground" class="form-control" value="#FF6B8B">
+                                </div>
+                                <button class="auth-btn" id="postStoryBtn">Post Story</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="drafts-tab">
+                        <div class="create-container">
+                            <h3 style="text-align: center; margin-bottom: 30px;">Your Drafts</h3>
+                            <div id="draftsList" style="width: 100%;">
+                                <p style="text-align: center; color: var(--gray-color);">No drafts yet. Create a video and save it as a draft.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Live Page -->
+                <div class="page" id="live-page">
+                    <div class="tab-navigation">
+                        <button class="tab-button active" data-tab="live-now">Live Now</button>
+                        <button class="tab-button" data-tab="upcoming">Upcoming</button>
+                        <button class="tab-button" data-tab="featured">Featured</button>
+                        <button class="tab-button" data-tab="subscribed">Subscribed</button>
+                    </div>
+                    
+                    <div class="tab-content active" id="live-now-tab">
+                        <div class="live-container">
+                            <div class="live-stream">
+                                <div class="live-player">
+                                    <div class="live-indicator">
+                                        <i class="fas fa-circle"></i> LIVE
+                                    </div>
+                                    <div class="live-viewers">
+                                        <i class="fas fa-eye"></i> <span id="viewerCount">12,542</span> viewers
+                                    </div>
+                                    <img src="https://images.unsplash.com/photo-1593305841991-05c297ba4575?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Live Stream" style="width: 100%; height: 400px; object-fit: cover;">
+                                </div>
+                                
+                                <div class="live-chat">
+                                    <div class="chat-header">Live Chat</div>
+                                    <div class="chat-messages" id="chatMessages">
+                                        <!-- Chat messages will be loaded here -->
+                                    </div>
+                                    <div class="chat-input-container">
+                                        <input type="text" class="chat-input" placeholder="Type your message..." id="chatInput">
+                                        <button class="chat-send-btn" id="sendChat">
+                                            <i class="fas fa-paper-plane"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <h3 style="margin: 30px 0 15px 0;">More Live Streams</h3>
+                            <div class="discover-container" id="liveStreamsList">
+                                <!-- Live streams will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="upcoming-tab">
+                        <div class="live-container">
+                            <h3 style="margin-bottom: 20px;">Upcoming Live Streams</h3>
+                            <div class="discover-container" id="upcomingStreams">
+                                <!-- Upcoming streams will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="featured-tab">
+                        <div class="live-container">
+                            <h3 style="margin-bottom: 20px;">Featured Live Streams</h3>
+                            <div class="discover-container" id="featuredStreams">
+                                <!-- Featured streams will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="subscribed-tab">
+                        <div class="live-container">
+                            <h3 style="margin-bottom: 20px;">Streams from Creators You Follow</h3>
+                            <div class="discover-container" id="subscribedStreams">
+                                <!-- Subscribed streams will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Inbox Page -->
+                <div class="page" id="inbox-page">
+                    <div class="tab-navigation">
+                        <button class="tab-button active" data-tab="messages">Messages</button>
+                        <button class="tab-button" data-tab="requests">Requests</button>
+                        <button class="tab-button" data-tab="notifications">Notifications</button>
+                        <button class="tab-button" data-tab="activity">Activity</button>
+                    </div>
+                    
+                    <div class="tab-content active" id="messages-tab">
+                        <div class="inbox-container">
+                            <div class="conversations-list" id="conversationsList">
+                                <!-- Conversations will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="requests-tab">
+                        <div class="inbox-container">
+                            <h3 style="margin-bottom: 20px;">Message Requests</h3>
+                            <div class="conversations-list" id="requestsList">
+                                <!-- Message requests will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="notifications-tab">
+                        <div class="inbox-container">
+                            <h3 style="margin-bottom: 20px;">Notifications</h3>
+                            <div id="notificationsList">
+                                <!-- Notifications will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="activity-tab">
+                        <div class="inbox-container">
+                            <h3 style="margin-bottom: 20px;">Your Activity</h3>
+                            <div id="activityList">
+                                <!-- Activity will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Profile Page -->
+                <div class="page" id="profile-page">
+                    <div class="tab-navigation">
+                        <button class="tab-button active" data-tab="videos">Videos</button>
+                        <button class="tab-button" data-tab="liked">Liked</button>
+                        <button class="tab-button" data-tab="playlists">Playlists</button>
+                        <button class="tab-button" data-tab="analytics">Analytics</button>
+                    </div>
+                    
+                    <div class="tab-content active" id="videos-tab">
+                        <div class="profile-container">
+                            <div class="profile-header">
+                                <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Profile" class="profile-avatar" id="profileAvatar">
+                                <div class="profile-info">
+                                    <h2 id="profileName">Alex Johnson</h2>
+                                    <div class="profile-username" id="profileUsername">@alexj</div>
+                                    <div class="profile-bio" id="profileBio">Digital creator | Cat lover | Travel enthusiast | Making videos that make people smile 😊</div>
+                                    
+                                    <div class="profile-stats">
+                                        <div class="stat" id="followersStat">
+                                            <div class="stat-number" id="followersCount">245K</div>
+                                            <div class="stat-label">Followers</div>
+                                        </div>
+                                        <div class="stat" id="followingStat">
+                                            <div class="stat-number" id="followingCount">342</div>
+                                            <div class="stat-label">Following</div>
+                                        </div>
+                                        <div class="stat" id="videosStat">
+                                            <div class="stat-number" id="videosCount">128</div>
+                                            <div class="stat-label">Videos</div>
+                                        </div>
+                                        <div class="stat" id="likesStat">
+                                            <div class="stat-number" id="likesCount">1.2M</div>
+                                            <div class="stat-label">Likes</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="profile-actions">
+                                        <button class="profile-btn edit-profile-btn" id="editProfileBtn">Edit Profile</button>
+                                        <button class="profile-btn share-profile-btn" id="shareProfileBtn">Share Profile</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <h3 style="margin: 30px 0 15px 0;">My Videos</h3>
+                            <div class="profile-content" id="profileVideos">
+                                <!-- User videos will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="liked-tab">
+                        <div class="profile-container">
+                            <h3 style="margin-bottom: 20px;">Videos You Liked</h3>
+                            <div class="profile-content" id="likedVideos">
+                                <!-- Liked videos will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="playlists-tab">
+                        <div class="profile-container">
+                            <h3 style="margin-bottom: 20px;">Your Playlists</h3>
+                            <div class="discover-container" id="playlistsList">
+                                <!-- Playlists will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="analytics-tab">
+                        <div class="profile-container">
+                            <h3 style="margin-bottom: 20px;">Your Analytics</h3>
+                            <div id="analyticsContent">
+                                <!-- Analytics will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Search Page -->
+                <div class="page" id="search-page">
+                    <div class="search-container-page">
+                        <div class="search-container" style="width: 100%; margin-bottom: 20px;">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="mainSearchInput" placeholder="Search videos, creators, sounds, hashtags...">
+                        </div>
+                        
+                        <div class="tab-navigation">
+                            <button class="tab-button active" data-tab="search-all">All</button>
+                            <button class="tab-button" data-tab="search-videos">Videos</button>
+                            <button class="tab-button" data-tab="search-users">Users</button>
+                            <button class="tab-button" data-tab="search-sounds">Sounds</button>
+                            <button class="tab-button" data-tab="search-hashtags">Hashtags</button>
+                        </div>
+                        
+                        <div class="tab-content active" id="search-all-tab">
+                            <div class="search-results" id="searchAllResults">
+                                <!-- All search results will be loaded here -->
+                            </div>
+                        </div>
+                        
+                        <div class="tab-content" id="search-videos-tab">
+                            <div class="search-results" id="searchVideosResults">
+                                <!-- Video search results will be loaded here -->
+                            </div>
+                        </div>
+                        
+                        <div class="tab-content" id="search-users-tab">
+                            <div class="search-results" id="searchUsersResults">
+                                <!-- User search results will be loaded here -->
+                            </div>
+                        </div>
+                        
+                        <div class="tab-content" id="search-sounds-tab">
+                            <div class="search-results" id="searchSoundsResults">
+                                <!-- Sound search results will be loaded here -->
+                            </div>
+                        </div>
+                        
+                        <div class="tab-content" id="search-hashtags-tab">
+                            <div class="search-results" id="searchHashtagsResults">
+                                <!-- Hashtag search results will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Notifications Page -->
+                <div class="page" id="notifications-page">
+                    <div class="notifications-container">
+                        <h2 style="margin-bottom: 20px;">Notifications</h2>
+                        <div class="tab-navigation">
+                            <button class="tab-button active" data-tab="notif-all">All</button>
+                            <button class="tab-button" data-tab="notif-likes">Likes</button>
+                            <button class="tab-button" data-tab="notif-comments">Comments</button>
+                            <button class="tab-button" data-tab="notif-follows">Follows</button>
+                            <button class="tab-button" data-tab="notif-mentions">Mentions</button>
+                        </div>
+                        
+                        <div class="tab-content active" id="notif-all-tab">
+                            <div id="allNotificationsList">
+                                <!-- All notifications will be loaded here -->
+                            </div>
+                        </div>
+                        
+                        <div class="tab-content" id="notif-likes-tab">
+                            <div id="likeNotificationsList">
+                                <!-- Like notifications will be loaded here -->
+                            </div>
+                        </div>
+                        
+                        <div class="tab-content" id="notif-comments-tab">
+                            <div id="commentNotificationsList">
+                                <!-- Comment notifications will be loaded here -->
+                            </div>
+                        </div>
+                        
+                        <div class="tab-content" id="notif-follows-tab">
+                            <div id="followNotificationsList">
+                                <!-- Follow notifications will be loaded here -->
+                            </div>
+                        </div>
+                        
+                        <div class="tab-content" id="notif-mentions-tab">
+                            <div id="mentionNotificationsList">
+                                <!-- Mention notifications will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile Bottom Navigation -->
+        <nav class="mobile-nav">
+            <div class="mobile-nav-items">
+                <a href="#" class="mobile-nav-item active" data-page="home">
+                    <i class="fas fa-home mobile-nav-icon"></i>
+                    <span class="mobile-nav-text">Home</span>
+                </a>
+                <a href="#" class="mobile-nav-item" data-page="discover">
+                    <i class="fas fa-compass mobile-nav-icon"></i>
+                    <span class="mobile-nav-text">Discover</span>
+                </a>
+                <a href="#" class="mobile-nav-item" data-page="create">
+                    <i class="fas fa-plus-circle mobile-nav-icon"></i>
+                    <span class="mobile-nav-text">Create</span>
+                </a>
+                <a href="#" class="mobile-nav-item" data-page="live">
+                    <i class="fas fa-broadcast-tower mobile-nav-icon"></i>
+                    <span class="mobile-nav-text">Live</span>
+                </a>
+                <a href="#" class="mobile-nav-item" data-page="profile">
+                    <i class="fas fa-user mobile-nav-icon"></i>
+                    <span class="mobile-nav-text">Profile</span>
+                </a>
+            </div>
+        </nav>
+        
+        <!-- Floating Action Button -->
+        <div class="fab" id="createFab">
+            <i class="fas fa-plus"></i>
+        </div>
+        
+        <!-- Authentication Modal -->
+        <div class="auth-modal active" id="authModal">
+            <div class="auth-container">
+                <div class="auth-tabs">
+                    <div class="auth-tab active" data-auth="login">Login</div>
+                    <div class="auth-tab" data-auth="register">Register</div>
+                </div>
+                
+                <!-- Login Form -->
+                <div class="auth-form" id="loginForm">
+                    <h2>Welcome to CAT TALKIE</h2>
+                    <div class="form-group">
+                        <label for="loginUsername">Email Address</label>
+                        <input type="email" id="loginUsername" class="form-control" placeholder="Enter your email">
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" id="loginPassword" class="form-control" placeholder="Enter password">
+                    </div>
+                    <button class="auth-btn" id="loginBtn">Login</button>
+                    <div class="auth-footer">
+                        Don't have an account? <a href="#" id="switchToRegister">Register</a>
+                    </div>
+                </div>
+                
+                <!-- Register Form -->
+                <div class="auth-form" id="registerForm" style="display: none;">
+                    <h2>Join CAT TALKIE</h2>
+                    <div class="form-group">
+                        <label for="registerName">Full Name</label>
+                        <input type="text" id="registerName" class="form-control" placeholder="Enter your full name">
+                    </div>
+                    <div class="form-group">
+                        <label for="registerUsername">Username</label>
+                        <input type="text" id="registerUsername" class="form-control" placeholder="Choose a username">
+                    </div>
+                    <div class="form-group">
+                        <label for="registerEmail">Email Address</label>
+                        <input type="email" id="registerEmail" class="form-control" placeholder="Enter your email">
+                    </div>
+                    <div class="form-group">
+                        <label for="registerPassword">Password</label>
+                        <input type="password" id="registerPassword" class="form-control" placeholder="Create a password (min 6 characters)">
+                    </div>
+                    <button class="auth-btn" id="registerBtn">Create Account</button>
+                    <div class="auth-footer">
+                        Already have an account? <a href="#" id="switchToLogin">Login</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- App Footer -->
+        <footer class="app-footer">
+            <div class="footer-links">
+                <a href="#">About</a>
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Help Center</a>
+                <a href="#">Contact</a>
+                <a href="#">Creators</a>
+                <a href="#">Advertise</a>
+                <a href="#">Careers</a>
+            </div>
+            <div class="creator-credit">Created by CAT PHOENIX</div>
+            <div>© 2023 CAT TALKIE. All rights reserved.</div>
+        </footer>
+    </div>
+
+    <script>
+        // ======================
+        // SUPABASE CONFIGURATION
+        // ======================
+
+        // Your Supabase credentials
+        const SUPABASE_URL = 'https://iybohxmgkepdbjvjhjzy.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml5Ym9oeG1na2VwZGJqdmpoanp5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUyMDk3NzAsImV4cCI6MjA4MDc4NTc3MH0.5iinQyQyDS703l072h8DQMz-QDFPuhWtpNvKPwpCfOk';
+
+        // Initialize Supabase client
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // ======================
+        // APP STATE
+        // ======================
+
+        let currentUser = null;
+        let isLoggedIn = false;
+        let currentPage = 'home';
+        let currentTab = {};
+
+        // ======================
+        // DATABASE SETUP
+        // ======================
+
+        async function setupDatabase() {
+            console.log('Setting up Supabase database...');
+            
+            try {
+                // Check if users table exists
+                const { data: usersTable, error: usersError } = await supabase
+                    .from('users')
+                    .select('count')
+                    .limit(1);
+                    
+                if (usersError && usersError.code === 'PGRST116') {
+                    console.log('Database tables not found. Please run the SQL setup in Supabase dashboard.');
+                } else {
+                    console.log('Database is ready!');
+                }
+            } catch (error) {
+                console.error('Database setup error:', error);
+            }
+        }
+
+        // ======================
+        // AUTHENTICATION FUNCTIONS
+        // ======================
+
+        // Supabase Login
+        async function handleLogin() {
+            const email = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!email || !password) {
+                alert('Please enter both email and password');
+                return;
+            }
+            
+            try {
+                // Sign in with Supabase Auth
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
+                
+                if (error) throw error;
+                
+                // Get user profile from database
+                const { data: userData, error: userError } = await supabase
+                    .from('users')
+                    .select('*')
+                    .eq('id', data.user.id)
+                    .single();
+                
+                if (userError) {
+                    // User doesn't exist in users table, create profile
+                    await createUserProfile(data.user, email);
+                    
+                    // Get the newly created profile
+                    const { data: newUserData } = await supabase
+                        .from('users')
+                        .select('*')
+                        .eq('id', data.user.id)
+                        .single();
+                        
+                    currentUser = {
+                        id: data.user.id,
+                        email: data.user.email,
+                        ...newUserData
+                    };
+                } else {
+                    currentUser = {
+                        id: data.user.id,
+                        email: data.user.email,
+                        ...userData
+                    };
+                }
+                
+                isLoggedIn = true;
+                localStorage.setItem('catTalkieUser', JSON.stringify(currentUser));
+                updateUIForLoggedInUser();
+                document.getElementById('authModal').classList.remove('active');
+                loadPageContent(currentPage);
+                
+                alert(`Welcome back, ${currentUser.full_name || currentUser.email}!`);
+                
+            } catch (error) {
+                console.error('Login error:', error);
+                alert(`Login failed: ${error.message}`);
+            }
+        }
+
+        // Supabase Registration
+        async function handleRegister() {
+            const fullName = document.getElementById('registerName').value;
+            const username = document.getElementById('registerUsername').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            
+            if (!fullName || !username || !email || !password) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            if (password.length < 6) {
+                alert('Password must be at least 6 characters long');
+                return;
+            }
+            
+            try {
+                // Check if username already exists
+                const { data: existingUser, error: checkError } = await supabase
+                    .from('users')
+                    .select('username')
+                    .eq('username', username)
+                    .single();
+                    
+                if (existingUser) {
+                    alert('Username already taken. Please choose another.');
+                    return;
+                }
+                
+                // Create user in Supabase Auth
+                const { data: authData, error: authError } = await supabase.auth.signUp({
+                    email: email,
+                    password: password,
+                    options: {
+                        data: {
+                            full_name: fullName,
+                            username: username
+                        }
+                    }
+                });
+                
+                if (authError) throw authError;
+                
+                // Create user profile in database
+                await createUserProfile(authData.user, email, fullName, username);
+                
+                // Sign in the user
+                const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
+                
+                if (signInError) throw signInError;
+                
+                // Get the newly created profile
+                const { data: userData } = await supabase
+                    .from('users')
+                    .select('*')
+                    .eq('id', signInData.user.id)
+                    .single();
+                    
+                currentUser = {
+                    id: signInData.user.id,
+                    email: signInData.user.email,
+                    ...userData
+                };
+                
+                isLoggedIn = true;
+                localStorage.setItem('catTalkieUser', JSON.stringify(currentUser));
+                updateUIForLoggedInUser();
+                document.getElementById('authModal').classList.remove('active');
+                
+                setActiveNavItemByPage('profile');
+                showPage('profile');
+                
+                alert(`Welcome to CAT TALKIE, ${currentUser.full_name}! Your account has been created.`);
+                
+            } catch (error) {
+                console.error('Registration error:', error);
+                alert(`Registration failed: ${error.message}`);
+            }
+        }
+
+        // Create user profile in database
+        async function createUserProfile(authUser, email, fullName = '', username = '') {
+            const avatarUrl = `https://api.dicebear.com/7.x/avataaars/svg?seed=${username || email}`;
+            
+            const userProfile = {
+                id: authUser.id,
+                email: email,
+                username: username || email.split('@')[0],
+                full_name: fullName || email.split('@')[0],
+                bio: 'New CAT TALKIE user! Excited to share my content with the world! 🎉',
+                avatar_url: avatarUrl,
+                followers_count: 0,
+                following_count: 0,
+                videos_count: 0,
+                likes_count: 0,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            };
+            
+            const { error } = await supabase
+                .from('users')
+                .insert([userProfile]);
+                
+            if (error) throw error;
+            
+            return userProfile;
+        }
+
+        // Check if user is already logged in
+        async function checkAuthStatus() {
+            try {
+                const { data: { session }, error } = await supabase.auth.getSession();
+                
+                if (error) throw error;
+                
+                if (session) {
+                    // User is logged in
+                    const { data: userData, error: userError } = await supabase
+                        .from('users')
+                        .select('*')
+                        .eq('id', session.user.id)
+                        .single();
+                        
+                    if (!userError && userData) {
+                        currentUser = {
+                            id: session.user.id,
+                            email: session.user.email,
+                            ...userData
+                        };
+                        isLoggedIn = true;
+                        updateUIForLoggedInUser();
+                        document.getElementById('authModal').classList.remove('active');
+                    }
+                }
+            } catch (error) {
+                console.error('Auth check error:', error);
+            }
+        }
+
+        // Logout function
+        async function logout() {
+            try {
+                const { error } = await supabase.auth.signOut();
+                if (error) throw error;
+                
+                currentUser = null;
+                isLoggedIn = false;
+                localStorage.removeItem('catTalkieUser');
+                
+                // Reset UI
+                document.getElementById('userAvatar').src = 'https://randomuser.me/api/portraits/men/32.jpg';
+                
+                // Show auth modal
+                document.getElementById('authModal').classList.add('active');
+                
+                // Clear all page content
+                clearAllPageContent();
+                
+                // Go to home page
+                setActiveNavItemByPage('home');
+                showPage('home');
+                
+            } catch (error) {
+                console.error('Logout error:', error);
+                alert('Logout failed: ' + error.message);
+            }
+        }
+
+        // ======================
+        // VIDEO FUNCTIONS
+        // ======================
+
+        // Upload video to Supabase Storage
+        async function uploadVideoToSupabase(videoFile, title, description, tags) {
+            if (!currentUser) {
+                alert('Please login to upload videos');
+                return;
+            }
+            
+            try {
+                // Generate unique filename
+                const timestamp = Date.now();
+                const fileExt = videoFile.name.split('.').pop();
+                const fileName = `${currentUser.id}/${timestamp}.${fileExt}`;
+                
+                // Upload to Supabase Storage
+                const { data: uploadData, error: uploadError } = await supabase.storage
+                    .from('videos')
+                    .upload(fileName, videoFile);
+                    
+                if (uploadError) throw uploadError;
+                
+                // Get public URL
+                const { data: { publicUrl } } = supabase.storage
+                    .from('videos')
+                    .getPublicUrl(fileName);
+                
+                // Create video record in database
+                const videoData = {
+                    user_id: currentUser.id,
+                    title: title,
+                    description: description,
+                    video_url: publicUrl,
+                    thumbnail_url: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                    tags: tags.split(',').map(tag => tag.trim()).filter(tag => tag),
+                    views_count: 0,
+                    likes_count: 0,
+                    comments_count: 0,
+                    shares_count: 0,
+                    is_public: true,
+                    created_at: new Date().toISOString()
+                };
+                
+                const { data: videoRecord, error: dbError } = await supabase
+                    .from('videos')
+                    .insert([videoData])
+                    .select()
+                    .single();
+                    
+                if (dbError) throw dbError;
+                
+                // Update user's video count
+                await supabase
+                    .from('users')
+                    .update({ 
+                        videos_count: currentUser.videos_count + 1,
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('id', currentUser.id);
+                
+                // Update current user data
+                currentUser.videos_count += 1;
+                localStorage.setItem('catTalkieUser', JSON.stringify(currentUser));
+                updateUIForLoggedInUser();
+                
+                alert(`Video "${title}" uploaded successfully!`);
+                
+                // Reset form
+                document.getElementById('uploadTrigger').style.display = 'block';
+                document.getElementById('uploadForm').style.display = 'none';
+                document.getElementById('videoTitle').value = '';
+                document.getElementById('videoDescription').value = '';
+                document.getElementById('videoTags').value = '';
+                
+                // Go to home and refresh
+                setActiveNavItemByPage('home');
+                showPage('home');
+                
+            } catch (error) {
+                console.error('Upload error:', error);
+                alert(`Upload failed: ${error.message}`);
+            }
+        }
+
+        // Load videos from Supabase
+        async function loadVideosFromSupabase(tabName = 'for-you', limit = 10) {
+            try {
+                let query = supabase
+                    .from('videos')
+                    .select(`
+                        *,
+                        users!inner(*)
+                    `)
+                    .eq('is_public', true)
+                    .order('created_at', { ascending: false })
+                    .limit(limit);
+                
+                // Apply filters based on tab
+                if (tabName === 'trending') {
+                    query = query.order('views_count', { ascending: false });
+                } else if (tabName === 'following' && currentUser) {
+                    // Get users that current user follows
+                    const { data: following } = await supabase
+                        .from('follows')
+                        .select('following_id')
+                        .eq('follower_id', currentUser.id);
+                        
+                    if (following && following.length > 0) {
+                        const followingIds = following.map(f => f.following_id);
+                        query = query.in('user_id', followingIds);
+                    } else {
+                        return []; // No following
+                    }
+                }
+                
+                const { data: videos, error } = await query;
+                
+                if (error) throw error;
+                
+                // Check likes for current user
+                const videosWithLikes = await Promise.all(videos.map(async (video) => {
+                    let isLiked = false;
+                    let isFollowing = false;
+                    
+                    if (currentUser) {
+                        // Check if video is liked
+                        const { data: like } = await supabase
+                            .from('likes')
+                            .select('id')
+                            .eq('user_id', currentUser.id)
+                            .eq('video_id', video.id)
+                            .single();
+                            
+                        isLiked = !!like;
+                        
+                        // Check if following the creator
+                        const { data: follow } = await supabase
+                            .from('follows')
+                            .select('id')
+                            .eq('follower_id', currentUser.id)
+                            .eq('following_id', video.user_id)
+                            .single();
+                            
+                        isFollowing = !!follow;
+                    }
+                    
+                    return {
+                        ...video,
+                        username: video.users.username,
+                        userAvatar: video.users.avatar_url,
+                        isLiked: isLiked,
+                        isFollowing: isFollowing,
+                        isPro: video.users.followers_count > 10000 // Simple pro check
+                    };
+                }));
+                
+                return videosWithLikes;
+                
+            } catch (error) {
+                console.error('Load videos error:', error);
+                return [];
+            }
+        }
+
+        // Like/Unlike a video
+        async function toggleVideoLike(videoId, isCurrentlyLiked) {
+            if (!currentUser) {
+                alert('Please login to like videos');
+                return;
+            }
+            
+            try {
+                if (isCurrentlyLiked) {
+                    // Unlike
+                    const { error } = await supabase
+                        .from('likes')
+                        .delete()
+                        .eq('user_id', currentUser.id)
+                        .eq('video_id', videoId);
+                        
+                    if (error) throw error;
+                    return false;
+                } else {
+                    // Like
+                    const { error } = await supabase
+                        .from('likes')
+                        .insert([{
+                            user_id: currentUser.id,
+                            video_id: videoId
+                        }]);
+                        
+                    if (error) throw error;
+                    
+                    // Create notification for video owner
+                    const { data: video } = await supabase
+                        .from('videos')
+                        .select('user_id, title')
+                        .eq('id', videoId)
+                        .single();
+                        
+                    if (video && video.user_id !== currentUser.id) {
+                        await supabase
+                            .from('notifications')
+                            .insert([{
+                                user_id: video.user_id,
+                                from_user_id: currentUser.id,
+                                type: 'like',
+                                content: `liked your video "${video.title.substring(0, 30)}..."`,
+                                video_id: videoId
+                            }]);
+                    }
+                    
+                    return true;
+                }
+            } catch (error) {
+                console.error('Toggle like error:', error);
+                return isCurrentlyLiked; // Return current state on error
+            }
+        }
+
+        // Follow/Unfollow a user
+        async function toggleFollowUser(userId, isCurrentlyFollowing) {
+            if (!currentUser) {
+                alert('Please login to follow users');
+                return;
+            }
+            
+            if (userId === currentUser.id) {
+                alert("You can't follow yourself!");
+                return isCurrentlyFollowing;
+            }
+            
+            try {
+                if (isCurrentlyFollowing) {
+                    // Unfollow
+                    const { error } = await supabase
+                        .from('follows')
+                        .delete()
+                        .eq('follower_id', currentUser.id)
+                        .eq('following_id', userId);
+                        
+                    if (error) throw error;
+                    return false;
+                } else {
+                    // Follow
+                    const { error } = await supabase
+                        .from('follows')
+                        .insert([{
+                            follower_id: currentUser.id,
+                            following_id: userId
+                        }]);
+                        
+                    if (error) throw error;
+                    return true;
+                }
+            } catch (error) {
+                console.error('Toggle follow error:', error);
+                return isCurrentlyFollowing; // Return current state on error
+            }
+        }
+
+        // ======================
+        // UPDATED APP FUNCTIONS
+        // ======================
+
+        // Initialize the app
+        async function initApp() {
+            // Setup database
+            await setupDatabase();
+            
+            // Check authentication status
+            await checkAuthStatus();
+            
+            // Set up event listeners
+            setupEventListeners();
+            
+            // Load initial page content
+            loadPageContent('home');
+        }
+
+        // Update loadHomeTab function
+        async function loadHomeTab(tabName) {
+            const container = document.getElementById(`${tabName}-tab`).querySelector('.video-feed-container');
+            container.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
+            
+            try {
+                const videos = await loadVideosFromSupabase(tabName, 10);
+                
+                if (videos.length === 0) {
+                    if (tabName === 'following') {
+                        container.innerHTML = '<p style="text-align: center; color: var(--gray-color); padding: 40px;">Follow more creators to see their content!</p>';
+                    } else {
+                        container.innerHTML = '<p style="text-align: center; color: var(--gray-color); padding: 40px;">No videos found. Be the first to upload!</p>';
+                    }
+                    return;
+                }
+                
+                // Render videos
+                container.innerHTML = '';
+                videos.forEach(video => {
+                    const videoCard = createVideoCard(video);
+                    container.appendChild(videoCard);
+                });
+                
+                // Add event listeners to the new video cards
+                addVideoCardEventListeners();
+                
+            } catch (error) {
+                console.error('Error loading videos:', error);
+                container.innerHTML = '<p style="text-align: center; color: var(--gray-color); padding: 40px;">Error loading videos. Please try again.</p>';
+            }
+        }
+
+        // Update video card creation
+        function createVideoCard(video) {
+            const card = document.createElement('div');
+            card.className = 'video-card';
+            card.dataset.videoId = video.id;
+            
+            // Format timestamp
+            const timestamp = formatTimeAgo(video.created_at);
+            
+            card.innerHTML = `
+                <div class="video-header">
+                    <div class="video-user">
+                        <img src="${video.userAvatar || 'https://randomuser.me/api/portraits/men/32.jpg'}" alt="User" class="user-avatar-small">
+                        <div class="user-info">
+                            <h4>${video.username} ${video.isPro ? '<span class="creator-badge">PRO</span>' : ''}</h4>
+                            <span>${timestamp}</span>
+                        </div>
+                    </div>
+                    <button class="follow-btn ${video.isFollowing ? 'following' : ''}" data-user-id="${video.user_id}">
+                        ${video.isFollowing ? 'Following' : 'Follow'}
+                    </button>
+                </div>
+                
+                <div class="video-player">
+                    <video id="video-${video.id}" poster="${video.thumbnail_url || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'}">
+                        <source src="${video.video_url}" type="video/mp4">
+                    </video>
+                    <div class="video-controls">
+                        <button class="video-control-btn" data-video-id="${video.id}">
+                            <i class="fas fa-play"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="video-stats">
+                    <div class="video-title">${video.title}</div>
+                    <div class="video-tags">
+                        ${(video.tags || []).map(tag => `<span class="tag">#${tag}</span>`).join('')}
+                    </div>
+                    <div class="engagement-stats">
+                        <div class="engagement-buttons">
+                            <button class="engagement-btn like-btn ${video.isLiked ? 'liked' : ''}" data-video-id="${video.id}">
+                                <i class="${video.isLiked ? 'fas' : 'far'} fa-heart"></i>
+                                <span class="like-count">${formatCount(video.likes_count)}</span>
+                            </button>
+                            <button class="engagement-btn" data-video-id="${video.id}">
+                                <i class="far fa-comment"></i>
+                                <span>${formatCount(video.comments_count)}</span>
+                            </button>
+                            <button class="engagement-btn" data-video-id="${video.id}">
+                                <i class="far fa-share-square"></i>
+                                <span>${formatCount(video.shares_count)}</span>
+                            </button>
+                        </div>
+                        <div class="view-count">${formatCount(video.views_count)} views</div>
+                    </div>
+                </div>
+            `;
+            
+            return card;
+        }
+
+        // Update event listeners for video interactions
+        function addVideoCardEventListeners() {
+            // Follow buttons
+            document.querySelectorAll('.follow-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    const userId = btn.dataset.userId;
+                    const isFollowing = btn.classList.contains('following');
+                    
+                    const newFollowState = await toggleFollowUser(userId, isFollowing);
+                    
+                    if (newFollowState !== undefined) {
+                        btn.textContent = newFollowState ? 'Following' : 'Follow';
+                        btn.classList.toggle('following', newFollowState);
+                    }
+                });
+            });
+            
+            // Like buttons
+            document.querySelectorAll('.like-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    const videoId = btn.dataset.videoId;
+                    const isLiked = btn.classList.contains('liked');
+                    
+                    const newLikeState = await toggleVideoLike(videoId, isLiked);
+                    
+                    if (newLikeState !== undefined) {
+                        btn.classList.toggle('liked', newLikeState);
+                        
+                        const icon = btn.querySelector('i');
+                        const countSpan = btn.querySelector('.like-count');
+                        let currentCount = parseInt(countSpan.textContent.replace('K', '') * 1000) || 0;
+                        
+                        if (newLikeState) {
+                            icon.className = 'fas fa-heart';
+                            currentCount += 1;
+                        } else {
+                            icon.className = 'far fa-heart';
+                            currentCount = Math.max(0, currentCount - 1);
+                        }
+                        
+                        countSpan.textContent = formatCount(currentCount);
+                    }
+                });
+            });
+            
+            // Video play buttons
+            document.querySelectorAll('.video-control-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const videoId = btn.dataset.videoId;
+                    const video = document.getElementById(`video-${videoId}`);
+                    const icon = btn.querySelector('i');
+                    
+                    if (video.paused) {
+                        video.play();
+                        icon.className = 'fas fa-pause';
+                    } else {
+                        video.pause();
+                        icon.className = 'fas fa-play';
+                    }
+                });
+            });
+        }
+
+        // ======================
+        // HELPER FUNCTIONS
+        // ======================
+
+        // Format time ago
+        function formatTimeAgo(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffSec = Math.floor(diffMs / 1000);
+            const diffMin = Math.floor(diffSec / 60);
+            const diffHour = Math.floor(diffMin / 60);
+            const diffDay = Math.floor(diffHour / 24);
+            
+            if (diffSec < 60) return 'Just now';
+            if (diffMin < 60) return `${diffMin}m ago`;
+            if (diffHour < 24) return `${diffHour}h ago`;
+            if (diffDay < 7) return `${diffDay}d ago`;
+            
+            return date.toLocaleDateString();
+        }
+
+        // Format count for display
+        function formatCount(count) {
+            if (count >= 1000000) {
+                return (count / 1000000).toFixed(1) + 'M';
+            } else if (count >= 1000) {
+                return (count / 1000).toFixed(1) + 'K';
+            }
+            return count.toString();
+        }
+
+        // Update UI for logged in user
+        function updateUIForLoggedInUser() {
+            if (!currentUser) return;
+            
+            // Update avatar
+            document.getElementById('userAvatar').src = currentUser.avatar_url || 'https://randomuser.me/api/portraits/men/32.jpg';
+            document.getElementById('profileAvatar').src = currentUser.avatar_url || 'https://randomuser.me/api/portraits/men/32.jpg';
+            
+            // Update profile info
+            document.getElementById('profileName').textContent = currentUser.full_name || currentUser.username;
+            document.getElementById('profileUsername').textContent = `@${currentUser.username}`;
+            document.getElementById('profileBio').textContent = currentUser.bio || 'New CAT TALKIE user!';
+            
+            // Update stats
+            document.getElementById('followersCount').textContent = formatCount(currentUser.followers_count || 0);
+            document.getElementById('followingCount').textContent = currentUser.following_count || 0;
+            document.getElementById('videosCount').textContent = currentUser.videos_count || 0;
+            document.getElementById('likesCount').textContent = formatCount(currentUser.likes_count || 0);
+        }
+
+        // Show a specific page
+        function showPage(pageName) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            // Show the requested page
+            const pageElement = document.getElementById(`${pageName}-page`);
+            if (pageElement) {
+                pageElement.classList.add('active');
+                currentPage = pageName;
+                
+                // Load content for the page
+                loadPageContent(pageName);
+                
+                // Scroll to top of page
+                document.querySelector('.content-area').scrollTop = 0;
+            }
+        }
+
+        // Load content for a page
+        function loadPageContent(pageName) {
+            // Set default tab for the page if not set
+            if (!currentTab[pageName]) {
+                switch(pageName) {
+                    case 'home':
+                        currentTab[pageName] = 'for-you';
+                        break;
+                    case 'discover':
+                        currentTab[pageName] = 'categories';
+                        break;
+                    case 'create':
+                        currentTab[pageName] = 'upload';
+                        break;
+                    case 'live':
+                        currentTab[pageName] = 'live-now';
+                        break;
+                    case 'inbox':
+                        currentTab[pageName] = 'messages';
+                        break;
+                    case 'profile':
+                        currentTab[pageName] = 'videos';
+                        break;
+                    case 'search':
+                        currentTab[pageName] = 'search-all';
+                        break;
+                    case 'notifications':
+                        currentTab[pageName] = 'notif-all';
+                        break;
+                }
+            }
+            
+            // Update tab UI
+            const tabButtons = document.querySelectorAll(`#${pageName}-page .tab-button`);
+            tabButtons.forEach(btn => {
+                if (btn.getAttribute('data-tab') === currentTab[pageName]) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            
+            const tabContents = document.querySelectorAll(`#${pageName}-page .tab-content`);
+            tabContents.forEach(content => {
+                if (content.id === `${currentTab[pageName]}-tab`) {
+                    content.classList.add('active');
+                } else {
+                    content.classList.remove('active');
+                }
+            });
+            
+            // Load content for the active tab
+            loadTabContent(pageName, currentTab[pageName]);
+        }
+
+        // Load content for a specific tab
+        function loadTabContent(pageName, tabName) {
+            switch(pageName) {
+                case 'home':
+                    loadHomeTab(tabName);
+                    break;
+                case 'discover':
+                    loadDiscoverTab(tabName);
+                    break;
+                case 'create':
+                    loadCreateTab(tabName);
+                    break;
+                case 'live':
+                    loadLiveTab(tabName);
+                    break;
+                case 'inbox':
+                    loadInboxTab(tabName);
+                    break;
+                case 'profile':
+                    loadProfileTab(tabName);
+                    break;
+                case 'search':
+                    loadSearchTab(tabName);
+                    break;
+                case 'notifications':
+                    loadNotificationsTab(tabName);
+                    break;
+            }
+        }
+
+        // Load discover tab content
+        function loadDiscoverTab(tabName) {
+            const container = document.getElementById(`${tabName}-tab`).querySelector('.discover-container');
+            
+            // Show loading
+            container.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
+            
+            // Simulate loading delay
+            setTimeout(() => {
+                container.innerHTML = '';
+                
+                switch(tabName) {
+                    case 'categories':
+                        // Load categories
+                        const categories = [
+                            { id: 1, name: "Comedy", image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", videoCount: "245K", likeCount: "12.5M" },
+                            { id: 2, name: "Music", image: "https://images.unsplash.com/photo-1511379938547-c1f69419868d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", videoCount: "512K", likeCount: "45.2M" },
+                            { id: 3, name: "Education", image: "https://images.unsplash.com/photo-1501504905252-473c47e087f8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", videoCount: "189K", likeCount: "8.7M" },
+                            { id: 4, name: "Gaming", image: "https://images.unsplash.com/photo-1534423861386-85a16f5d13fd?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", videoCount: "634K", likeCount: "67.3M" },
+                            { id: 5, name: "Fitness", image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", videoCount: "312K", likeCount: "23.8M" },
+                            { id: 6, name: "Fashion", image: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", videoCount: "421K", likeCount: "31.5M" }
+                        ];
+                        
+                        categories.forEach(category => {
+                            const categoryCard = document.createElement('div');
+                            categoryCard.className = 'category-card';
+                            categoryCard.innerHTML = `
+                                <img src="${category.image}" alt="${category.name}" class="category-image">
+                                <div class="category-info">
+                                    <div class="category-name">${category.name}</div>
+                                    <div class="category-stats">
+                                        <span>${category.videoCount} videos</span>
+                                        <span>${category.likeCount} likes</span>
+                                    </div>
+                                </div>
+                            `;
+                            categoryCard.addEventListener('click', () => {
+                                alert(`Exploring ${category.name} category`);
+                            });
+                            container.appendChild(categoryCard);
+                        });
+                        break;
+                }
+            }, 500);
+        }
+
+        // Clear all page content
+        function clearAllPageContent() {
+            const containers = [
+                '.video-feed-container',
+                '.discover-container',
+                '.conversations-list',
+                '#notificationsList',
+                '#profileVideos',
+                '.search-results'
+            ];
+            
+            containers.forEach(selector => {
+                document.querySelectorAll(selector).forEach(container => {
+                    container.innerHTML = '';
+                });
+            });
+        }
+
+        // ======================
+        // EVENT LISTENERS SETUP
+        // ======================
+
+        function setupEventListeners() {
+            // Auth tab switching
+            document.querySelectorAll('.auth-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const authType = tab.getAttribute('data-auth');
+                    switchAuthTab(authType);
+                });
+            });
+            
+            // Switch between login and register forms
+            document.getElementById('switchToRegister').addEventListener('click', (e) => {
+                e.preventDefault();
+                switchAuthTab('register');
+            });
+            
+            document.getElementById('switchToLogin').addEventListener('click', (e) => {
+                e.preventDefault();
+                switchAuthTab('login');
+            });
+            
+            // Login button
+            document.getElementById('loginBtn').addEventListener('click', handleLogin);
+            
+            // Register button
+            document.getElementById('registerBtn').addEventListener('click', handleRegister);
+            
+            // User avatar click (logout)
+            document.getElementById('userAvatar').addEventListener('click', () => {
+                if (isLoggedIn) {
+                    if (confirm('Are you sure you want to logout?')) {
+                        logout();
+                    }
+                } else {
+                    document.getElementById('authModal').classList.add('active');
+                }
+            });
+            
+            // Navigation
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const page = item.getAttribute('data-page');
+                    setActiveNavItem(item);
+                    showPage(page);
+                });
+            });
+            
+            // Mobile navigation
+            document.querySelectorAll('.mobile-nav-item').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const page = item.getAttribute('data-page');
+                    
+                    // Update both desktop and mobile nav
+                    setActiveNavItemByPage(page);
+                    showPage(page);
+                });
+            });
+            
+            // Tab navigation within pages
+            document.addEventListener('click', (e) => {
+                if (e.target.classList.contains('tab-button')) {
+                    const tabId = e.target.getAttribute('data-tab');
+                    const page = currentPage;
+                    
+                    // Update active tab button
+                    const tabButtons = e.target.parentElement.querySelectorAll('.tab-button');
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    e.target.classList.add('active');
+                    
+                    // Update active tab content
+                    const tabContents = document.getElementById(`${page}-page`).querySelectorAll('.tab-content');
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    document.getElementById(`${tabId}-tab`).classList.add('active');
+                    
+                    // Load content for the tab
+                    currentTab[page] = tabId;
+                    loadTabContent(page, tabId);
+                }
+            });
+            
+            // Search functionality
+            document.getElementById('openSearch').addEventListener('click', () => {
+                showPage('search');
+            });
+            
+            // Notifications
+            document.getElementById('openNotifications').addEventListener('click', () => {
+                showPage('notifications');
+            });
+            
+            // Messages
+            document.getElementById('openMessages').addEventListener('click', () => {
+                showPage('inbox');
+            });
+            
+            // Create FAB
+            document.getElementById('createFab').addEventListener('click', () => {
+                setActiveNavItemByPage('create');
+                showPage('create');
+            });
+            
+            // Upload trigger
+            document.getElementById('uploadTrigger').addEventListener('click', () => {
+                // Create a file input element
+                const fileInput = document.createElement('input');
+                fileInput.type = 'file';
+                fileInput.accept = 'video/*';
+                fileInput.style.display = 'none';
+                
+                fileInput.addEventListener('change', (e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                        // Show upload form
+                        document.getElementById('uploadTrigger').style.display = 'none';
+                        document.getElementById('uploadForm').style.display = 'block';
+                        
+                        // Store file for later upload
+                        window.selectedVideoFile = file;
+                    }
+                });
+                
+                document.body.appendChild(fileInput);
+                fileInput.click();
+                document.body.removeChild(fileInput);
+            });
+            
+            // Submit video
+            document.getElementById('submitVideo').addEventListener('click', (e) => {
+                e.preventDefault();
+                const title = document.getElementById('videoTitle').value;
+                const description = document.getElementById('videoDescription').value;
+                const tags = document.getElementById('videoTags').value;
+                
+                if (!title) {
+                    alert('Please enter a video title');
+                    return;
+                }
+                
+                if (!window.selectedVideoFile) {
+                    alert('Please select a video file');
+                    return;
+                }
+                
+                // Upload video to Supabase
+                uploadVideoToSupabase(window.selectedVideoFile, title, description, tags);
+            });
+            
+            // Edit profile
+            document.getElementById('editProfileBtn').addEventListener('click', () => {
+                if (!currentUser) {
+                    alert('Please login to edit profile');
+                    return;
+                }
+                
+                const newName = prompt('Enter your new name:', currentUser.full_name);
+                if (newName) {
+                    // Update in Supabase
+                    supabase
+                        .from('users')
+                        .update({ 
+                            full_name: newName,
+                            updated_at: new Date().toISOString()
+                        })
+                        .eq('id', currentUser.id)
+                        .then(({ error }) => {
+                            if (!error) {
+                                currentUser.full_name = newName;
+                                localStorage.setItem('catTalkieUser', JSON.stringify(currentUser));
+                                document.getElementById('profileName').textContent = newName;
+                            }
+                        });
+                }
+                
+                const newBio = prompt('Enter your new bio:', currentUser.bio);
+                if (newBio !== null) {
+                    // Update in Supabase
+                    supabase
+                        .from('users')
+                        .update({ 
+                            bio: newBio,
+                            updated_at: new Date().toISOString()
+                        })
+                        .eq('id', currentUser.id)
+                        .then(({ error }) => {
+                            if (!error) {
+                                currentUser.bio = newBio;
+                                localStorage.setItem('catTalkieUser', JSON.stringify(currentUser));
+                                document.getElementById('profileBio').textContent = newBio;
+                            }
+                        });
+                }
+            });
+        }
+
+        // Switch between login and register tabs
+        function switchAuthTab(authType) {
+            document.querySelectorAll('.auth-tab').forEach(tab => {
+                if (tab.getAttribute('data-auth') === authType) {
+                    tab.classList.add('active');
+                } else {
+                    tab.classList.remove('active');
+                }
+            });
+            
+            if (authType === 'login') {
+                document.getElementById('loginForm').style.display = 'block';
+                document.getElementById('registerForm').style.display = 'none';
+            } else {
+                document.getElementById('loginForm').style.display = 'none';
+                document.getElementById('registerForm').style.display = 'block';
+            }
+        }
+
+        // Set active nav item
+        function setActiveNavItem(item) {
+            document.querySelectorAll('.nav-item').forEach(navItem => {
+                navItem.classList.remove('active');
+            });
+            item.classList.add('active');
+            
+            // Also update mobile nav
+            const page = item.getAttribute('data-page');
+            setActiveMobileNavItem(page);
+        }
+
+        // Set active nav item by page
+        function setActiveNavItemByPage(page) {
+            // Desktop nav
+            document.querySelectorAll('.nav-item').forEach(navItem => {
+                if (navItem.getAttribute('data-page') === page) {
+                    navItem.classList.add('active');
+                } else {
+                    navItem.classList.remove('active');
+                }
+            });
+            
+            // Mobile nav
+            setActiveMobileNavItem(page);
+        }
+
+        // Set active mobile nav item
+        function setActiveMobileNavItem(page) {
+            document.querySelectorAll('.mobile-nav-item').forEach(navItem => {
+                if (navItem.getAttribute('data-page') === page) {
+                    navItem.classList.add('active');
+                } else {
+                    navItem.classList.remove('active');
+                }
+            });
+        }
+
+        // ======================
+        // INITIALIZE APP
+        // ======================
+
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('CAT TALKIE with Supabase - Initializing...');
+            initApp();
+        });
+    </script>
+</body>
+</html>
