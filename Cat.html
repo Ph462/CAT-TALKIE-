@@ -1,0 +1,3250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#FF3366">
+    <meta name="description" content="CAT TALKIE - The world's best social video platform for sharing, discovering, and connecting through amazing video content">
+    <title>🐱 CAT TALKIE | Social Video Platform</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        /* 🌈 Universal Design System - Works on EVERY Device */
+        :root {
+            /* Color System */
+            --primary: #FF3366;
+            --primary-dark: #D91A4D;
+            --secondary: #7B68EE;
+            --accent: #00D4FF;
+            --success: #00FF88;
+            --warning: #FFAA00;
+            --danger: #FF4757;
+            --dark: #0A0A0A;
+            --dark-light: #1A1A1A;
+            --light: #FFFFFF;
+            --gray: #808080;
+            --light-gray: #E0E0E0;
+            
+            /* Gradients */
+            --gradient-primary: linear-gradient(135deg, var(--primary), var(--secondary));
+            --gradient-dark: linear-gradient(135deg, #1A1A2E, #16213E);
+            --gradient-card: linear-gradient(145deg, rgba(40, 40, 60, 0.95), rgba(20, 20, 40, 0.95));
+            
+            /* Shadows */
+            --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 5px 20px rgba(0, 0, 0, 0.2);
+            --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.3);
+            --shadow-glow: 0 0 30px rgba(255, 51, 102, 0.3);
+            
+            /* Transitions */
+            --transition-fast: all 0.2s ease;
+            --transition-normal: all 0.3s ease;
+            --transition-slow: all 0.5s ease;
+            
+            /* Layout */
+            --header-height: 70px;
+            --sidebar-width: 280px;
+            --bottom-nav-height: 65px;
+        }
+
+        /* 🔧 Extreme Universal Reset - Works on ALL Devices */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+            text-size-adjust: 100%;
+        }
+
+        html {
+            font-size: 16px;
+            scroll-behavior: smooth;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            width: 100%;
+            height: 100%;
+            overflow-x: hidden;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--dark);
+            color: var(--light);
+            line-height: 1.6;
+            min-height: 100vh;
+            min-height: -webkit-fill-available;
+            width: 100%;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* 📱 Universal Container System */
+        .container {
+            width: 100%;
+            max-width: 100%;
+            padding: 0 5vw;
+            margin: 0 auto;
+        }
+
+        @media (min-width: 768px) {
+            .container {
+                max-width: 95vw;
+                padding: 0 2.5vw;
+            }
+        }
+
+        @media (min-width: 1200px) {
+            .container {
+                max-width: 1200px;
+                padding: 0;
+            }
+        }
+
+        /* ✨ Utility Classes */
+        .flex { display: flex; }
+        .flex-col { flex-direction: column; }
+        .items-center { align-items: center; }
+        .justify-center { justify-content: center; }
+        .justify-between { justify-content: space-between; }
+        .text-center { text-align: center; }
+        .hidden { display: none !important; }
+        .visible { display: block !important; }
+        .full-width { width: 100%; }
+        .full-height { height: 100%; }
+        .text-gradient {
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* 🎭 Authentication Pages */
+        .auth-page {
+            min-height: 100vh;
+            min-height: -webkit-fill-available;
+            background: var(--gradient-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 5vw;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 10000;
+            overflow-y: auto;
+        }
+
+        .auth-container {
+            background: rgba(30, 30, 50, 0.95);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border-radius: 25px;
+            padding: clamp(20px, 5vw, 40px);
+            width: 100%;
+            max-width: min(500px, 90vw);
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: clamp(20px, 5vw, 40px);
+        }
+
+        .auth-logo {
+            font-size: clamp(2rem, 8vw, 3rem);
+            font-weight: 800;
+            margin-bottom: clamp(15px, 4vw, 20px);
+        }
+
+        .auth-title {
+            font-size: clamp(1.5rem, 6vw, 2rem);
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .auth-subtitle {
+            color: var(--gray);
+            font-size: clamp(0.9rem, 4vw, 1rem);
+        }
+
+        /* 📝 Forms */
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: clamp(15px, 4vw, 20px);
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: var(--light-gray);
+            font-size: clamp(0.85rem, 4vw, 0.95rem);
+        }
+
+        .form-input {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: clamp(12px, 4vw, 15px) clamp(15px, 4vw, 20px);
+            color: var(--light);
+            font-size: clamp(0.95rem, 4vw, 1rem);
+            transition: var(--transition-normal);
+            width: 100%;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: var(--shadow-glow);
+        }
+
+        /* 🎯 Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: clamp(14px, 4vw, 16px) clamp(24px, 6vw, 32px);
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: clamp(0.95rem, 4vw, 1rem);
+            transition: var(--transition-normal);
+            cursor: pointer;
+            border: none;
+            width: 100%;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--light);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* 👤 Profile Creation */
+        .profile-creation {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 10001;
+            background: var(--gradient-dark);
+            overflow-y: auto;
+        }
+
+        .profile-creation.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 5vw;
+        }
+
+        .avatar-upload {
+            position: relative;
+            width: clamp(80px, 25vw, 120px);
+            height: clamp(80px, 25vw, 120px);
+            margin: 0 auto clamp(20px, 5vw, 30px);
+            cursor: pointer;
+        }
+
+        .avatar-preview {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(2rem, 8vw, 3rem);
+            font-weight: bold;
+            overflow: hidden;
+        }
+
+        /* 🚀 Main App Container */
+        .app-container {
+            display: none;
+            min-height: 100vh;
+            min-height: -webkit-fill-available;
+            position: relative;
+        }
+
+        .app-container.active {
+            display: block;
+        }
+
+        /* 🎭 Smart Header - Works on ALL Devices */
+        .app-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: clamp(60px, 10vh, 70px);
+            background: rgba(10, 10, 15, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 1000;
+            padding: 0 5vw;
+            display: flex;
+            align-items: center;
+        }
+
+        .header-content {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+        }
+
+        .logo {
+            font-size: clamp(1.2rem, 5vw, 1.8rem);
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            white-space: nowrap;
+        }
+
+        /* 🔍 Search Bar */
+        .header-search {
+            flex: 1;
+            max-width: 500px;
+            display: none;
+        }
+
+        @media (min-width: 768px) {
+            .header-search {
+                display: block;
+            }
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 10px 45px 10px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 25px;
+            color: var(--light);
+            font-size: 0.95rem;
+        }
+
+        /* 🎮 Header Actions */
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: clamp(8px, 2vw, 15px);
+        }
+
+        .action-button {
+            width: clamp(35px, 8vw, 45px);
+            height: clamp(35px, 8vw, 45px);
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--light);
+            font-size: clamp(1rem, 4vw, 1.2rem);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition-normal);
+        }
+
+        .user-avatar {
+            width: clamp(35px, 8vw, 45px);
+            height: clamp(35px, 8vw, 45px);
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: clamp(1rem, 4vw, 1.2rem);
+            cursor: pointer;
+            overflow: hidden;
+            border: 3px solid transparent;
+        }
+
+        /* 🎨 Sidebar Navigation */
+        .app-sidebar {
+            position: fixed;
+            top: clamp(60px, 10vh, 70px);
+            left: 0;
+            bottom: 0;
+            width: clamp(250px, 70vw, 280px);
+            background: rgba(15, 15, 25, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            padding: clamp(15px, 4vw, 25px) 0;
+            overflow-y: auto;
+            z-index: 900;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        .app-sidebar.active {
+            transform: translateX(0);
+        }
+
+        @media (min-width: 992px) {
+            .app-sidebar {
+                transform: translateX(0);
+                width: 280px;
+            }
+        }
+
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            padding: 0 clamp(15px, 4vw, 20px);
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: clamp(12px, 3vw, 15px) clamp(15px, 4vw, 20px);
+            border-radius: 12px;
+            color: var(--gray);
+            transition: var(--transition-normal);
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--light);
+            transform: translateX(5px);
+        }
+
+        .nav-item.active {
+            background: rgba(255, 51, 102, 0.15);
+            color: var(--primary);
+        }
+
+        /* 🎥 Main Content Area */
+        .app-main {
+            padding: clamp(15px, 4vw, 30px);
+            padding-top: calc(clamp(60px, 10vh, 70px) + clamp(15px, 4vw, 30px));
+            padding-bottom: calc(clamp(60px, 8vh, 65px) + clamp(15px, 4vw, 30px));
+            min-height: 100vh;
+            transition: margin-left 0.3s ease;
+        }
+
+        @media (min-width: 992px) {
+            .app-main {
+                margin-left: 280px;
+                padding-top: calc(70px + 30px);
+            }
+        }
+
+        /* 📱 Bottom Navigation - Mobile Only */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: clamp(55px, 8vh, 65px);
+            background: rgba(10, 10, 15, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 1000;
+            display: flex;
+        }
+
+        @media (min-width: 992px) {
+            .bottom-nav {
+                display: none;
+            }
+        }
+
+        .bottom-nav-items {
+            display: flex;
+            width: 100%;
+            height: 100%;
+        }
+
+        .bottom-nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--gray);
+            transition: var(--transition-normal);
+            text-decoration: none;
+        }
+
+        .bottom-nav-item.active {
+            color: var(--primary);
+        }
+
+        /* 🎬 Video Grid - Responsive on ALL Screens */
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr));
+            gap: clamp(15px, 4vw, 25px);
+            margin-bottom: 40px;
+        }
+
+        .video-card {
+            background: var(--gradient-card);
+            border-radius: clamp(15px, 4vw, 20px);
+            overflow: hidden;
+            transition: var(--transition-normal);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+        }
+
+        .video-thumbnail {
+            position: relative;
+            height: clamp(150px, 40vw, 200px);
+            overflow: hidden;
+        }
+
+        .video-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        /* 👤 Profile Page */
+        .profile-header {
+            background: var(--gradient-card);
+            border-radius: clamp(15px, 4vw, 25px);
+            padding: clamp(20px, 5vw, 40px);
+            margin-bottom: clamp(20px, 5vw, 40px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: clamp(20px, 5vw, 30px);
+        }
+
+        @media (min-width: 768px) {
+            .profile-header {
+                flex-direction: row;
+                align-items: center;
+            }
+        }
+
+        .profile-avatar-large {
+            width: clamp(100px, 30vw, 150px);
+            height: clamp(100px, 30vw, 150px);
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(2.5rem, 10vw, 3.5rem);
+            font-weight: bold;
+            overflow: hidden;
+        }
+
+        /* ⚙️ Settings Page */
+        .settings-container {
+            background: var(--gradient-card);
+            border-radius: clamp(15px, 4vw, 25px);
+            padding: clamp(20px, 5vw, 30px);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .settings-section {
+            margin-bottom: 30px;
+        }
+
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            margin-bottom: 10px;
+            transition: var(--transition-normal);
+        }
+
+        /* ℹ️ About Page */
+        .about-container {
+            background: var(--gradient-card);
+            border-radius: clamp(15px, 4vw, 25px);
+            padding: clamp(20px, 5vw, 40px);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .creator-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        @media (min-width: 768px) {
+            .creator-info {
+                flex-direction: row;
+            }
+        }
+
+        /* 🎬 Video Player Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 2000;
+            padding: 20px;
+            overflow-y: auto;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: var(--gradient-card);
+            border-radius: clamp(15px, 4vw, 25px);
+            padding: clamp(20px, 5vw, 30px);
+            width: 100%;
+            max-width: min(1000px, 95vw);
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        /* 📤 Real Video Upload */
+        .upload-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .upload-area {
+            border: 3px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: clamp(30px, 8vw, 60px) clamp(20px, 5vw, 40px);
+            text-align: center;
+            margin-bottom: 30px;
+            cursor: pointer;
+            transition: var(--transition-normal);
+        }
+
+        .video-preview {
+            width: 100%;
+            max-height: 400px;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .video-preview video {
+            width: 100%;
+            height: auto;
+            max-height: 400px;
+            object-fit: contain;
+        }
+
+        /* 🔔 Notifications */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--gradient-card);
+            padding: 15px 25px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-lg);
+            border-left: 4px solid var(--primary);
+            z-index: 3000;
+            animation: slideInRight 0.3s ease;
+            max-width: min(400px, 90vw);
+        }
+
+        /* 🎯 Page Transitions */
+        .page-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .page-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 📱 Extreme Device Compatibility */
+        @media (orientation: landscape) and (max-height: 500px) {
+            .auth-page {
+                padding: 2vw;
+            }
+            
+            .auth-container {
+                max-height: 90vh;
+                overflow-y: auto;
+            }
+            
+            .video-thumbnail {
+                height: 120px;
+            }
+        }
+
+        /* 🖥️ 4K and Large Screens */
+        @media (min-width: 1920px) {
+            .container {
+                max-width: 1600px;
+            }
+            
+            .video-grid {
+                grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            }
+        }
+
+        /* 📟 Very Small Screens */
+        @media (max-width: 320px) {
+            .auth-container {
+                padding: 15px;
+            }
+            
+            .nav-item {
+                padding: 10px 15px;
+                font-size: 0.9rem;
+            }
+            
+            .video-grid {
+                gap: 10px;
+            }
+        }
+
+        /* 🖋️ Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--gradient-primary);
+            border-radius: 4px;
+        }
+
+        /* 🎨 Loading States */
+        .skeleton {
+            background: linear-gradient(90deg, 
+                rgba(255, 255, 255, 0.1) 25%, 
+                rgba(255, 255, 255, 0.2) 50%, 
+                rgba(255, 255, 255, 0.1) 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 8px;
+        }
+
+        @keyframes loading {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        /* 🎬 Video Card Enhancements */
+        .video-overlay {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .video-info {
+            padding: 15px;
+        }
+
+        .video-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .creator-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .creator-info {
+            flex: 1;
+        }
+
+        .creator-info h4 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .creator-info p {
+            color: var(--gray);
+            font-size: 0.8rem;
+        }
+
+        .video-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            line-height: 1.3;
+        }
+
+        .video-stats {
+            display: flex;
+            gap: 15px;
+            color: var(--gray);
+            font-size: 0.85rem;
+            margin-bottom: 15px;
+        }
+
+        .video-stats span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .video-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .video-action {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: var(--light);
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: var(--transition-normal);
+        }
+
+        .video-action:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .video-action.active {
+            background: rgba(255, 51, 102, 0.2);
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        /* 🔑 Switch CSS */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: var(--primary);
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        /* Animation for notifications */
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* 📝 Category Tabs */
+        .category-tabs {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            margin-bottom: 30px;
+            padding-bottom: 10px;
+            scrollbar-width: none;
+        }
+
+        .category-tabs::-webkit-scrollbar {
+            display: none;
+        }
+
+        .category-tab {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            color: var(--gray);
+            font-weight: 500;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: var(--transition-normal);
+            border: 1px solid transparent;
+        }
+
+        .category-tab.active {
+            background: rgba(255, 51, 102, 0.2);
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        /* ✨ Featured Creators */
+        .featured-creators {
+            display: flex;
+            gap: 20px;
+            overflow-x: auto;
+            margin-bottom: 40px;
+            padding-bottom: 15px;
+        }
+
+        .creator-card {
+            min-width: 150px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .creator-avatar-sm {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            margin: 0 auto 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            overflow: hidden;
+        }
+
+        /* 🔥 Live Badge */
+        .live-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: var(--danger);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+
+        /* 💬 Comments Section */
+        .comments-section {
+            margin-top: 30px;
+        }
+
+        .comment-item {
+            display: flex;
+            gap: 15px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .comment-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        /* 📊 Statistics Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            color: var(--primary);
+        }
+    </style>
+</head>
+<body>
+    <!-- 🔐 Authentication System -->
+    <div id="authPage" class="auth-page">
+        <div class="auth-container">
+            <div class="auth-header">
+                <div class="auth-logo text-gradient">🐱 CAT TALKIE</div>
+                <h1 class="auth-title" id="authTitle">Welcome to CAT TALKIE</h1>
+                <p class="auth-subtitle" id="authSubtitle">Sign in to start watching amazing videos</p>
+            </div>
+
+            <form id="authForm" class="auth-form">
+                <div id="signupFields" style="display: none;">
+                    <div class="form-group">
+                        <label class="form-label" for="fullName">
+                            <i class="fas fa-user"></i> Full Name
+                        </label>
+                        <input type="text" id="fullName" class="form-input" placeholder="Enter your full name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="username">
+                            <i class="fas fa-at"></i> Username
+                        </label>
+                        <input type="text" id="username" class="form-input" placeholder="Choose a unique username" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="email">
+                        <i class="fas fa-envelope"></i> Email Address
+                    </label>
+                    <input type="email" id="email" class="form-input" placeholder="Enter your email" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="password">
+                        <i class="fas fa-lock"></i> Password
+                    </label>
+                    <input type="password" id="password" class="form-input" placeholder="Enter your password" required minlength="6">
+                </div>
+
+                <div class="form-group" id="confirmPasswordGroup" style="display: none;">
+                    <label class="form-label" for="confirmPassword">
+                        <i class="fas fa-lock"></i> Confirm Password
+                    </label>
+                    <input type="password" id="confirmPassword" class="form-input" placeholder="Confirm your password" minlength="6">
+                </div>
+
+                <button type="submit" id="authButton" class="btn btn-primary">
+                    <i class="fas fa-sign-in-alt"></i>
+                    <span id="authButtonText">Sign In</span>
+                </button>
+
+                <div class="auth-footer" style="text-align: center; margin-top: 20px; color: var(--gray);">
+                    <span id="authFooterText">Don't have an account?</span>
+                    <a class="auth-link" id="authToggleLink" style="color: var(--primary); font-weight: 600; margin-left: 5px; cursor: pointer;">Sign Up</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 👤 Profile Creation -->
+    <div id="profileCreation" class="profile-creation">
+        <div class="auth-container">
+            <div class="auth-header">
+                <div class="auth-logo text-gradient">🐱 CAT TALKIE</div>
+                <h1 class="auth-title">Complete Your Profile</h1>
+                <p class="auth-subtitle">Tell us more about yourself to personalize your experience</p>
+            </div>
+
+            <form id="profileForm" class="auth-form">
+                <div class="avatar-upload" id="avatarUpload">
+                    <div class="avatar-preview" id="avatarPreview">
+                        <span id="avatarInitials">U</span>
+                        <img id="avatarImage" style="display: none;">
+                    </div>
+                    <div class="avatar-overlay" style="position: absolute; bottom: 0; right: 0; background: var(--primary); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid var(--dark);">
+                        <i class="fas fa-camera" style="font-size: 0.9rem;"></i>
+                    </div>
+                    <input type="file" id="avatarInput" accept="image/*" style="display: none;">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="profileName">
+                        <i class="fas fa-user"></i> Display Name
+                    </label>
+                    <input type="text" id="profileName" class="form-input" placeholder="Enter your display name" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="profileUsername">
+                        <i class="fas fa-at"></i> Username
+                    </label>
+                    <input type="text" id="profileUsername" class="form-input" placeholder="Choose a unique username" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="profileBio">
+                        <i class="fas fa-edit"></i> Bio
+                    </label>
+                    <textarea id="profileBio" class="form-input" rows="4" placeholder="Tell us about yourself..."></textarea>
+                </div>
+
+                <button type="submit" id="completeProfileButton" class="btn btn-primary">
+                    <i class="fas fa-check"></i>
+                    Complete Profile & Enter App
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 🚀 Main Application -->
+    <div id="appContainer" class="app-container">
+        <!-- 🎭 Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <div class="logo text-gradient" id="menuToggle">
+                    <i class="fas fa-cat"></i>
+                    <span>CAT TALKIE</span>
+                </div>
+
+                <div class="header-search">
+                    <input type="text" class="search-input" placeholder="Search videos, creators, tags..." id="globalSearch">
+                    <i class="fas fa-search" style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%); color: var(--gray);"></i>
+                </div>
+
+                <div class="header-actions">
+                    <button class="action-button" id="uploadButton" title="Upload Video">
+                        <i class="fas fa-plus"></i>
+                    </button>
+
+                    <button class="action-button" id="themeButton" title="Toggle Theme">
+                        <i class="fas fa-moon"></i>
+                    </button>
+
+                    <button class="action-button" id="notificationButton" title="Notifications" style="position: relative;">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge" style="position: absolute; top: -5px; right: -5px; background: var(--danger); color: white; font-size: 0.7rem; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">3</span>
+                    </button>
+
+                    <div class="user-menu" style="position: relative;">
+                        <div class="user-avatar" id="userMenuButton">
+                            <span id="userAvatarText">U</span>
+                            <img id="userAvatarImage" style="display: none;">
+                        </div>
+                        <div id="userDropdown" style="display: none; position: absolute; top: 100%; right: 0; background: rgba(30, 30, 40, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 15px; padding: 10px; min-width: 200px; box-shadow: var(--shadow-lg); z-index: 1001; margin-top: 10px;">
+                            <a href="#" class="nav-item" data-page="profile" style="display: block; padding: 10px 15px; border-radius: 8px; margin-bottom: 5px;">
+                                <i class="fas fa-user"></i> My Profile
+                            </a>
+                            <a href="#" class="nav-item" data-page="settings" style="display: block; padding: 10px 15px; border-radius: 8px; margin-bottom: 5px;">
+                                <i class="fas fa-cog"></i> Settings
+                            </a>
+                            <div style="height: 1px; background: rgba(255, 255, 255, 0.1); margin: 10px 0;"></div>
+                            <a href="#" class="nav-item" id="logoutButton" style="display: block; padding: 10px 15px; border-radius: 8px; color: var(--danger);">
+                                <i class="fas fa-sign-out-alt"></i> Log Out
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- 🎨 Sidebar Navigation -->
+        <nav class="app-sidebar" id="sidebar">
+            <div class="sidebar-nav">
+                <a href="#" class="nav-item active" data-page="home">
+                    <i class="fas fa-home"></i>
+                    <span>Home</span>
+                </a>
+                <a href="#" class="nav-item" data-page="explore">
+                    <i class="fas fa-compass"></i>
+                    <span>Explore</span>
+                </a>
+                <a href="#" class="nav-item" data-page="trending">
+                    <i class="fas fa-fire"></i>
+                    <span>Trending</span>
+                </a>
+                <a href="#" class="nav-item" data-page="subscriptions">
+                    <i class="fas fa-users"></i>
+                    <span>Subscriptions</span>
+                </a>
+                <a href="#" class="nav-item" data-page="profile">
+                    <i class="fas fa-user"></i>
+                    <span>Profile</span>
+                </a>
+            </div>
+
+            <div style="height: 1px; background: rgba(255, 255, 255, 0.1); margin: 25px 20px;"></div>
+
+            <div class="sidebar-nav">
+                <a href="#" class="nav-item" data-page="library">
+                    <i class="fas fa-photo-video"></i>
+                    <span>Library</span>
+                </a>
+                <a href="#" class="nav-item" data-page="history">
+                    <i class="fas fa-history"></i>
+                    <span>History</span>
+                </a>
+                <a href="#" class="nav-item" data-page="saved">
+                    <i class="fas fa-bookmark"></i>
+                    <span>Saved</span>
+                </a>
+                <a href="#" class="nav-item" data-page="liked">
+                    <i class="fas fa-heart"></i>
+                    <span>Liked Videos</span>
+                </a>
+            </div>
+
+            <div style="height: 1px; background: rgba(255, 255, 255, 0.1); margin: 25px 20px;"></div>
+
+            <div class="sidebar-nav">
+                <a href="#" class="nav-item" data-page="about">
+                    <i class="fas fa-info-circle"></i>
+                    <span>About</span>
+                </a>
+                <a href="#" class="nav-item" data-page="settings">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </a>
+                <a href="#" class="nav-item" data-page="help">
+                    <i class="fas fa-question-circle"></i>
+                    <span>Help & Support</span>
+                </a>
+            </div>
+
+            <div style="margin: 25px 20px; padding: 20px; background: rgba(255, 255, 255, 0.05); border-radius: 15px;">
+                <div style="font-size: 0.9rem; color: var(--gray); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px;">Trending Now 🔥</div>
+                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                    <span class="tag" style="background: rgba(255, 255, 255, 0.1); padding: 6px 12px; border-radius: 20px; font-size: 0.85rem; cursor: pointer;">#CatMagic</span>
+                    <span class="tag" style="background: rgba(255, 255, 255, 0.1); padding: 6px 12px; border-radius: 20px; font-size: 0.85rem; cursor: pointer;">#FunnyCats</span>
+                    <span class="tag" style="background: rgba(255, 255, 255, 0.1); padding: 6px 12px; border-radius: 20px; font-size: 0.85rem; cursor: pointer;">#PetLife</span>
+                </div>
+            </div>
+        </nav>
+
+        <!-- 🎥 Main Content Area -->
+        <main class="app-main" id="mainContent">
+            <!-- Home Page -->
+            <div id="homePage" class="page-content active">
+                <div style="margin-bottom: 30px;">
+                    <h1 style="font-size: clamp(1.8rem, 5vw, 2.5rem); font-weight: 700; margin-bottom: 10px;">Welcome to CAT TALKIE! 🎬</h1>
+                    <p style="color: var(--gray); font-size: clamp(1rem, 4vw, 1.1rem);">Discover amazing videos from creators around the world</p>
+                </div>
+
+                <!-- Category Tabs -->
+                <div class="category-tabs">
+                    <div class="category-tab active" data-category="all">All Videos</div>
+                    <div class="category-tab" data-category="trending">Trending</div>
+                    <div class="category-tab" data-category="gaming">Gaming</div>
+                    <div class="category-tab" data-category="music">Music</div>
+                    <div class="category-tab" data-category="education">Education</div>
+                    <div class="category-tab" data-category="comedy">Comedy</div>
+                    <div class="category-tab" data-category="sports">Sports</div>
+                </div>
+
+                <!-- Featured Creators -->
+                <div style="margin-bottom: 40px;">
+                    <h3 style="font-size: 1.3rem; margin-bottom: 20px; font-weight: 600;">Featured Creators 🌟</h3>
+                    <div class="featured-creators">
+                        <div class="creator-card">
+                            <div class="creator-avatar-sm">CL</div>
+                            <div style="font-weight: 600; margin-bottom: 5px;">CatLover</div>
+                            <div style="color: var(--gray); font-size: 0.85rem;">1.2M followers</div>
+                        </div>
+                        <div class="creator-card">
+                            <div class="creator-avatar-sm">KP</div>
+                            <div style="font-weight: 600; margin-bottom: 5px;">KittyPro</div>
+                            <div style="color: var(--gray); font-size: 0.85rem;">890K followers</div>
+                        </div>
+                        <div class="creator-card">
+                            <div class="creator-avatar-sm">PM</div>
+                            <div style="font-weight: 600; margin-bottom: 5px;">PetMaster</div>
+                            <div style="color: var(--gray); font-size: 0.85rem;">540K followers</div>
+                        </div>
+                        <div class="creator-card">
+                            <div class="creator-avatar-sm">FW</div>
+                            <div style="font-weight: 600; margin-bottom: 5px;">FurryWorld</div>
+                            <div style="color: var(--gray); font-size: 0.85rem;">320K followers</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Video Grid -->
+                <div class="video-grid" id="videoGrid">
+                    <!-- Videos will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Profile Page -->
+            <div id="profilePage" class="page-content">
+                <div class="profile-header">
+                    <div class="profile-avatar-large" id="profileLargeAvatar">
+                        <span id="profileAvatarText">U</span>
+                        <img id="profileAvatarImage" style="display: none;">
+                    </div>
+                    <div style="flex: 1;">
+                        <h1 id="profileNameDisplay" style="font-size: clamp(1.8rem, 5vw, 2.5rem); font-weight: 700; margin-bottom: 10px;">User Name</h1>
+                        <p id="profileUsernameDisplay" style="color: var(--gray); font-size: 1.1rem; margin-bottom: 15px;">@username</p>
+                        <p id="profileBioDisplay" style="color: var(--light-gray); line-height: 1.6; margin-bottom: 20px; max-width: 600px;">This is your bio. You can edit it in settings.</p>
+                        
+                        <div style="display: flex; gap: 30px; margin-bottom: 25px;">
+                            <div>
+                                <div style="font-size: 1.8rem; font-weight: 700;" id="profileFollowers">0</div>
+                                <div style="color: var(--gray); font-size: 0.9rem;">Followers</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 1.8rem; font-weight: 700;" id="profileFollowing">0</div>
+                                <div style="color: var(--gray); font-size: 0.9rem;">Following</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 1.8rem; font-weight: 700;" id="profileVideos">0</div>
+                                <div style="color: var(--gray); font-size: 0.9rem;">Videos</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 1.8rem; font-weight: 700;" id="profileLikes">0</div>
+                                <div style="color: var(--gray); font-size: 0.9rem;">Likes</div>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; gap: 15px;">
+                            <button class="btn btn-primary" id="editProfileBtn" style="width: auto; padding: 12px 25px;">
+                                <i class="fas fa-edit"></i> Edit Profile
+                            </button>
+                            <button class="btn btn-secondary" id="shareProfileBtn" style="width: auto; padding: 12px 25px;">
+                                <i class="fas fa-share"></i> Share Profile
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 30px;">
+                    <div style="display: flex; border-bottom: 1px solid rgba(255, 255, 255, 0.1); overflow-x: auto;">
+                        <button class="tab-button active" data-tab="myVideos" style="padding: 15px 25px; background: none; border: none; color: var(--light); font-weight: 500; border-bottom: 3px solid var(--primary); white-space: nowrap;">My Videos</button>
+                        <button class="tab-button" data-tab="likedVideos" style="padding: 15px 25px; background: none; border: none; color: var(--gray); font-weight: 500; white-space: nowrap;">Liked Videos</button>
+                        <button class="tab-button" data-tab="playlists" style="padding: 15px 25px; background: none; border: none; color: var(--gray); font-weight: 500; white-space: nowrap;">Playlists</button>
+                        <button class="tab-button" data-tab="analytics" style="padding: 15px 25px; background: none; border: none; color: var(--gray); font-weight: 500; white-space: nowrap;">Analytics</button>
+                    </div>
+                </div>
+
+                <div id="myVideosTab" class="tab-content active">
+                    <div class="video-grid" id="myVideosGrid">
+                        <!-- User's videos will appear here -->
+                    </div>
+                </div>
+
+                <div id="analyticsTab" class="tab-content" style="display: none;">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number" id="totalViews">0</div>
+                            <div>Total Views</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="totalLikes">0</div>
+                            <div>Total Likes</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="totalComments">0</div>
+                            <div>Comments</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="avgWatchTime">0:00</div>
+                            <div>Avg. Watch Time</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- About Page -->
+            <div id="aboutPage" class="page-content">
+                <div class="about-container">
+                    <h1 style="font-size: clamp(1.8rem, 5vw, 2.5rem); font-weight: 700; margin-bottom: 30px; text-align: center;">About CAT TALKIE 🐱</h1>
+                    
+                    <div class="creator-info">
+                        <div style="text-align: center;">
+                            <div style="width: 150px; height: 150px; border-radius: 50%; background: var(--gradient-primary); display: flex; align-items: center; justify-content: center; font-size: 3rem; font-weight: bold; margin: 0 auto 20px;">CT</div>
+                            <h2 style="font-size: 1.8rem; margin-bottom: 10px;">Cat Talkie Team</h2>
+                            <p style="color: var(--gray);">Founder & Lead Developer</p>
+                        </div>
+                        <div style="flex: 1;">
+                            <h3 style="font-size: 1.3rem; margin-bottom: 15px;">Our Story</h3>
+                            <p style="color: var(--light-gray); line-height: 1.6; margin-bottom: 20px;">
+                                CAT TALKIE was born from a passion for connecting people through video content. Our mission is to create a platform where creators can share their stories, talents, and passions with the world in a safe and engaging environment.
+                            </p>
+                            <p style="color: var(--light-gray); line-height: 1.6; margin-bottom: 20px;">
+                                Founded in 2024, we've grown into a community of millions of users who share, discover, and connect through amazing video content every day.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div style="margin: 40px 0;">
+                        <h3 style="font-size: 1.3rem; margin-bottom: 20px;">Our Mission</h3>
+                        <p style="color: var(--light-gray); line-height: 1.6; margin-bottom: 15px;">
+                            To empower creators and connect communities through innovative video technology and a user-friendly platform that works seamlessly on every device.
+                        </p>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 40px 0;">
+                        <div style="background: rgba(255, 255, 255, 0.05); padding: 25px; border-radius: 15px;">
+                            <i class="fas fa-users" style="font-size: 2rem; color: var(--primary); margin-bottom: 15px;"></i>
+                            <h4 style="font-size: 1.2rem; margin-bottom: 10px;">Community First</h4>
+                            <p style="color: var(--gray);">Building a safe and inclusive space for everyone</p>
+                        </div>
+                        <div style="background: rgba(255, 255, 255, 0.05); padding: 25px; border-radius: 15px;">
+                            <i class="fas fa-video" style="font-size: 2rem; color: var(--accent); margin-bottom: 15px;"></i>
+                            <h4 style="font-size: 1.2rem; margin-bottom: 10px;">Quality Content</h4>
+                            <p style="color: var(--gray);">Promoting high-quality, original content</p>
+                        </div>
+                        <div style="background: rgba(255, 255, 255, 0.05); padding: 25px; border-radius: 15px;">
+                            <i class="fas fa-mobile-alt" style="font-size: 2rem; color: var(--success); margin-bottom: 15px;"></i>
+                            <h4 style="font-size: 1.2rem; margin-bottom: 10px;">Universal Access</h4>
+                            <p style="color: var(--gray);">Works perfectly on every device, anywhere</p>
+                        </div>
+                    </div>
+
+                    <div style="margin: 40px 0; text-align: center;">
+                        <h3 style="font-size: 1.3rem; margin-bottom: 20px;">Join Our Community</h3>
+                        <p style="color: var(--light-gray); line-height: 1.6; margin-bottom: 25px; max-width: 600px; margin-left: auto; margin-right: auto;">
+                            Be part of a growing community of creators and viewers who share a passion for amazing video content.
+                        </p>
+                        <button class="btn btn-primary" onclick="navigateToPage('home')" style="width: auto; padding: 12px 30px;">
+                            <i class="fas fa-play-circle"></i> Start Watching
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Page -->
+            <div id="settingsPage" class="page-content">
+                <div class="settings-container">
+                    <h1 style="font-size: clamp(1.8rem, 5vw, 2.5rem); font-weight: 700; margin-bottom: 30px;">Settings ⚙️</h1>
+                    
+                    <div class="settings-section">
+                        <h2 style="font-size: 1.3rem; margin-bottom: 20px; color: var(--light);">Account Settings</h2>
+                        <div class="setting-item">
+                            <div>
+                                <div style="font-weight: 600; margin-bottom: 5px;">Email Address</div>
+                                <div style="color: var(--gray); font-size: 0.9rem;" id="currentEmail">user@example.com</div>
+                            </div>
+                            <button class="btn btn-secondary" style="width: auto; padding: 8px 16px;" onclick="showNotification('Change email feature coming soon!', 'info')">Change</button>
+                        </div>
+                        
+                        <div class="setting-item">
+                            <div>
+                                <div style="font-weight: 600; margin-bottom: 5px;">Password</div>
+                                <div style="color: var(--gray); font-size: 0.9rem;">••••••••</div>
+                            </div>
+                            <button class="btn btn-secondary" style="width: auto; padding: 8px 16px;" onclick="showNotification('Change password feature coming soon!', 'info')">Change</button>
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <h2 style="font-size: 1.3rem; margin-bottom: 20px; color: var(--light);">Preferences</h2>
+                        <div class="setting-item">
+                            <div>
+                                <div style="font-weight: 600; margin-bottom: 5px;">Dark Mode</div>
+                                <div style="color: var(--gray); font-size: 0.9rem;">Switch between light and dark themes</div>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" id="darkModeToggle" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        
+                        <div class="setting-item">
+                            <div>
+                                <div style="font-weight: 600; margin-bottom: 5px;">Notifications</div>
+                                <div style="color: var(--gray); font-size: 0.9rem;">Manage your notification preferences</div>
+                            </div>
+                            <button class="btn btn-secondary" style="width: auto; padding: 8px 16px;" onclick="showNotification('Notification settings coming soon!', 'info')">Manage</button>
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <h2 style="font-size: 1.3rem; margin-bottom: 20px; color: var(--light);">Privacy & Security</h2>
+                        <div class="setting-item">
+                            <div>
+                                <div style="font-weight: 600; margin-bottom: 5px;">Private Account</div>
+                                <div style="color: var(--gray); font-size: 0.9rem;">Only approved followers can see your content</div>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" id="privateAccountToggle">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        
+                        <div class="setting-item">
+                            <div>
+                                <div style="font-weight: 600; margin-bottom: 5px;">Download Videos</div>
+                                <div style="color: var(--gray); font-size: 0.9rem;">Allow others to download your videos</div>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" id="downloadToggle" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 40px; text-align: center;">
+                        <button class="btn btn-primary" id="saveSettingsBtn" style="width: auto; padding: 12px 30px;">
+                            <i class="fas fa-save"></i> Save Changes
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Explore Page -->
+            <div id="explorePage" class="page-content">
+                <div style="margin-bottom: 30px;">
+                    <h1 style="font-size: clamp(1.8rem, 5vw, 2.5rem); font-weight: 700; margin-bottom: 10px;">Explore 🌍</h1>
+                    <p style="color: var(--gray); font-size: clamp(1rem, 4vw, 1.1rem);">Discover trending videos from around the world</p>
+                </div>
+
+                <div class="category-tabs">
+                    <div class="category-tab active" data-category="all">All</div>
+                    <div class="category-tab" data-category="gaming">Gaming</div>
+                    <div class="category-tab" data-category="music">Music</div>
+                    <div class="category-tab" data-category="vlogs">Vlogs</div>
+                    <div class="category-tab" data-category="education">Education</div>
+                    <div class="category-tab" data-category="comedy">Comedy</div>
+                </div>
+
+                <div class="video-grid" id="exploreGrid"></div>
+            </div>
+
+            <!-- Trending Page -->
+            <div id="trendingPage" class="page-content">
+                <div style="margin-bottom: 30px;">
+                    <h1 style="font-size: clamp(1.8rem, 5vw, 2.5rem); font-weight: 700; margin-bottom: 10px;">Trending 🔥</h1>
+                    <p style="color: var(--gray); font-size: clamp(1rem, 4vw, 1.1rem);">The hottest videos right now</p>
+                </div>
+
+                <div class="stats-grid" style="margin-bottom: 30px;">
+                    <div class="stat-card">
+                        <div class="stat-number">24M</div>
+                        <div>Daily Views</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">1.2M</div>
+                        <div>Daily Uploads</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">89K</div>
+                        <div>Active Creators</div>
+                    </div>
+                </div>
+
+                <div class="video-grid" id="trendingGrid"></div>
+            </div>
+
+            <!-- Library Page -->
+            <div id="libraryPage" class="page-content">
+                <div style="margin-bottom: 30px;">
+                    <h1 style="font-size: clamp(1.8rem, 5vw, 2.5rem); font-weight: 700; margin-bottom: 10px;">Library 📚</h1>
+                    <p style="color: var(--gray); font-size: clamp(1rem, 4vw, 1.1rem);">Your saved content and playlists</p>
+                </div>
+                <div class="video-grid" id="libraryGrid"></div>
+            </div>
+
+            <!-- History Page -->
+            <div id="historyPage" class="page-content">
+                <div style="margin-bottom: 30px;">
+                    <h1 style="font-size: clamp(1.8rem, 5vw, 2.5rem); font-weight: 700; margin-bottom: 10px;">History 📜</h1>
+                    <p style="color: var(--gray); font-size: clamp(1rem, 4vw, 1.1rem);">Recently watched videos</p>
+                </div>
+                <div class="video-grid" id="historyGrid"></div>
+            </div>
+
+            <!-- Subscriptions Page -->
+            <div id="subscriptionsPage" class="page-content">
+                <div style="margin-bottom: 30px;">
+                    <h1 style="font-size: clamp(1.8rem, 5vw, 2.5rem); font-weight: 700; margin-bottom: 10px;">Subscriptions 👥</h1>
+                    <p style="color: var(--gray); font-size: clamp(1rem, 4vw, 1.1rem);">Latest from creators you follow</p>
+                </div>
+                <div class="video-grid" id="subscriptionsGrid"></div>
+            </div>
+        </main>
+
+        <!-- 📱 Bottom Navigation (Mobile) -->
+        <nav class="bottom-nav">
+            <div class="bottom-nav-items">
+                <a href="#" class="bottom-nav-item active" data-page="home">
+                    <i class="fas fa-home"></i>
+                    <span style="font-size: 0.7rem; margin-top: 5px;">Home</span>
+                </a>
+                <a href="#" class="bottom-nav-item" data-page="explore">
+                    <i class="fas fa-compass"></i>
+                    <span style="font-size: 0.7rem; margin-top: 5px;">Explore</span>
+                </a>
+                <a href="#" class="bottom-nav-item" data-page="upload">
+                    <i class="fas fa-plus-circle"></i>
+                    <span style="font-size: 0.7rem; margin-top: 5px;">Upload</span>
+                </a>
+                <a href="#" class="bottom-nav-item" data-page="notifications">
+                    <i class="fas fa-bell"></i>
+                    <span style="font-size: 0.7rem; margin-top: 5px;">Alerts</span>
+                </a>
+                <a href="#" class="bottom-nav-item" data-page="profile">
+                    <i class="fas fa-user"></i>
+                    <span style="font-size: 0.7rem; margin-top: 5px;">Profile</span>
+                </a>
+            </div>
+        </nav>
+    </div>
+
+    <!-- 🎬 Video Player Modal -->
+    <div id="videoPlayerModal" class="modal">
+        <div class="modal-content">
+            <div style="position: absolute; top: 20px; right: 20px; z-index: 10;">
+                <button id="closeVideoModal" style="background: rgba(0,0,0,0.5); border: none; color: white; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 1.2rem;">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div style="position: relative; padding-top: 56.25%; background: #000; border-radius: 15px; overflow: hidden;">
+                <video id="videoPlayer" controls style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;">
+                    <source src="" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+            <div style="padding: 30px;">
+                <h2 id="videoModalTitle" style="font-size: 1.8rem; margin-bottom: 15px;">Video Title</h2>
+                <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 20px;">
+                    <div class="creator-avatar" id="modalCreatorAvatar">C</div>
+                    <div>
+                        <h4 id="modalCreatorName" style="font-size: 1.1rem; margin-bottom: 5px;">Creator Name</h4>
+                        <p id="modalVideoStats" style="color: var(--gray); font-size: 0.9rem;">1.2M views • 2 days ago</p>
+                    </div>
+                </div>
+                <p id="modalVideoDescription" style="color: var(--light-gray); line-height: 1.6; margin-bottom: 30px;">
+                    Video description goes here. This is where the creator describes what the video is about.
+                </p>
+                <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                    <button class="btn btn-secondary" id="likeVideoBtn" style="width: auto; padding: 10px 20px;">
+                        <i class="far fa-heart"></i> <span id="likeText">Like</span>
+                    </button>
+                    <button class="btn btn-secondary" id="shareVideoBtn" style="width: auto; padding: 10px 20px;">
+                        <i class="fas fa-share"></i> Share
+                    </button>
+                    <button class="btn btn-secondary" id="saveVideoBtn" style="width: auto; padding: 10px 20px;">
+                        <i class="far fa-bookmark"></i> Save
+                    </button>
+                    <button class="btn btn-secondary" id="downloadVideoBtn" style="width: auto; padding: 10px 20px;">
+                        <i class="fas fa-download"></i> Download
+                    </button>
+                </div>
+
+                <!-- Comments Section -->
+                <div class="comments-section" id="commentsSection" style="display: none;">
+                    <h3 style="font-size: 1.3rem; margin: 30px 0 20px;">Comments (24)</h3>
+                    <div class="comment-item">
+                        <div class="comment-avatar">U1</div>
+                        <div>
+                            <div style="font-weight: 600; margin-bottom: 5px;">User123</div>
+                            <p style="color: var(--light-gray);">This video is amazing! Great content!</p>
+                            <div style="color: var(--gray); font-size: 0.85rem; margin-top: 5px;">2 hours ago</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 📤 Real Video Upload Modal -->
+    <div id="uploadModal" class="modal">
+        <div class="modal-content">
+            <div style="position: absolute; top: 20px; right: 20px; z-index: 10;">
+                <button id="closeUploadModal" style="background: rgba(0,0,0,0.5); border: none; color: white; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 1.2rem;">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="upload-container">
+                <h2 style="font-size: 2rem; font-weight: 700; margin-bottom: 10px;">Upload Video</h2>
+                <p style="color: var(--gray); margin-bottom: 30px;">Share your amazing content with the world</p>
+                
+                <div class="upload-area" id="uploadArea">
+                    <i class="fas fa-cloud-upload-alt" style="font-size: 3rem; color: var(--primary); margin-bottom: 20px;"></i>
+                    <h3 style="font-size: 1.5rem; margin-bottom: 10px;">Select a Video File</h3>
+                    <p style="color: var(--gray);">Click to browse or drag & drop your video file</p>
+                    <p style="color: var(--gray); font-size: 0.9rem; margin-top: 10px;">Supports: MP4, WebM, MOV (Max 1GB)</p>
+                    <input type="file" id="videoFileInput" accept="video/*" style="display: none;">
+                </div>
+                
+                <div class="video-preview" id="videoPreview">
+                    <video id="videoPreviewPlayer" controls>
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+                
+                <div style="margin-top: 30px;">
+                    <div class="form-group">
+                        <label class="form-label" for="videoTitleInput">
+                            <i class="fas fa-heading"></i> Video Title
+                        </label>
+                        <input type="text" id="videoTitleInput" class="form-input" placeholder="Enter a catchy title for your video">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="videoDescriptionInput">
+                            <i class="fas fa-edit"></i> Description
+                        </label>
+                        <textarea id="videoDescriptionInput" class="form-input" rows="4" placeholder="Describe your video..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="videoTagsInput">
+                            <i class="fas fa-tags"></i> Tags
+                        </label>
+                        <input type="text" id="videoTagsInput" class="form-input" placeholder="funny, cats, pets, viral (comma separated)">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-globe"></i> Visibility
+                        </label>
+                        <select id="videoVisibility" class="form-input">
+                            <option value="public">Public (Everyone can see)</option>
+                            <option value="private">Private (Only you can see)</option>
+                            <option value="unlisted">Unlisted (Anyone with link can see)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-film"></i> Category
+                        </label>
+                        <select id="videoCategory" class="form-input">
+                            <option value="entertainment">Entertainment</option>
+                            <option value="gaming">Gaming</option>
+                            <option value="music">Music</option>
+                            <option value="education">Education</option>
+                            <option value="comedy">Comedy</option>
+                            <option value="sports">Sports</option>
+                        </select>
+                    </div>
+                    
+                    <button class="btn btn-primary" id="submitUploadBtn" style="margin-top: 20px;">
+                        <i class="fas fa-upload"></i> Upload Video
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🔔 Notifications Modal -->
+    <div id="notificationsModal" class="modal">
+        <div class="modal-content">
+            <div style="position: absolute; top: 20px; right: 20px; z-index: 10;">
+                <button id="closeNotificationsModal" style="background: rgba(0,0,0,0.5); border: none; color: white; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 1.2rem;">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <h2 style="font-size: 1.8rem; font-weight: 700; margin-bottom: 30px;">Notifications</h2>
+            
+            <div id="notificationsList">
+                <!-- Notifications will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 🚀 Supabase Configuration
+        const SUPABASE_URL = 'https://mjhuocpjtghrmpfmxpwz.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1qaHVvY3BqdGdocm1wZm14cHd6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU1NDE1NDYsImV4cCI6MjA4MTExNzU0Nn0.8ru4ZopfZKu5BaAlZDLCUfpbCwcdDpvu__F0ZOFw750';
+        
+        // Initialize Supabase
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        
+        // 🎮 Application State
+        const AppState = {
+            currentUser: null,
+            isLoggedIn: false,
+            isSignUp: false,
+            currentPage: 'home',
+            videos: [],
+            myVideos: [],
+            likedVideos: new Set(),
+            savedVideos: new Set(),
+            notifications: [],
+            darkMode: true,
+            uploadedVideos: [],
+            watchedVideos: [],
+            categories: ['All', 'Trending', 'Gaming', 'Music', 'Education', 'Comedy', 'Sports'],
+            
+            init() {
+                // Load from localStorage
+                const savedUser = localStorage.getItem('catTalkieUser');
+                const savedProfile = localStorage.getItem('catTalkieProfile');
+                const savedVideos = localStorage.getItem('catTalkieVideos');
+                const savedHistory = localStorage.getItem('catTalkieHistory');
+                
+                if (savedUser) {
+                    this.currentUser = JSON.parse(savedUser);
+                    this.isLoggedIn = true;
+                }
+                
+                if (savedProfile) {
+                    this.currentUser = { ...this.currentUser, ...JSON.parse(savedProfile) };
+                }
+                
+                if (savedVideos) {
+                    this.uploadedVideos = JSON.parse(savedVideos);
+                }
+                
+                if (savedHistory) {
+                    this.watchedVideos = JSON.parse(savedHistory);
+                }
+                
+                this.darkMode = localStorage.getItem('catTalkieDarkMode') !== 'false';
+                this.applyTheme();
+                
+                // Load liked videos
+                const savedLikes = localStorage.getItem('catTalkieLikes');
+                if (savedLikes) {
+                    this.likedVideos = new Set(JSON.parse(savedLikes));
+                }
+                
+                // Load saved videos
+                const savedSaves = localStorage.getItem('catTalkieSaves');
+                if (savedSaves) {
+                    this.savedVideos = new Set(JSON.parse(savedSaves));
+                }
+            },
+            
+            saveUser() {
+                if (this.currentUser) {
+                    localStorage.setItem('catTalkieUser', JSON.stringify({
+                        email: this.currentUser.email,
+                        name: this.currentUser.name,
+                        username: this.currentUser.username
+                    }));
+                }
+            },
+            
+            saveProfile() {
+                if (this.currentUser) {
+                    const profile = {
+                        displayName: this.currentUser.displayName,
+                        username: this.currentUser.username,
+                        bio: this.currentUser.bio,
+                        avatar: this.currentUser.avatar,
+                        followers: this.currentUser.followers || 0,
+                        following: this.currentUser.following || 0,
+                        videos: this.currentUser.videos || 0
+                    };
+                    localStorage.setItem('catTalkieProfile', JSON.stringify(profile));
+                }
+            },
+            
+            saveVideos() {
+                localStorage.setItem('catTalkieVideos', JSON.stringify(this.uploadedVideos));
+            },
+            
+            saveHistory() {
+                localStorage.setItem('catTalkieHistory', JSON.stringify(this.watchedVideos));
+            },
+            
+            saveLikes() {
+                localStorage.setItem('catTalkieLikes', JSON.stringify([...this.likedVideos]));
+            },
+            
+            saveSaves() {
+                localStorage.setItem('catTalkieSaves', JSON.stringify([...this.savedVideos]));
+            },
+            
+            applyTheme() {
+                document.body.style.backgroundColor = this.darkMode ? '#0A0A0A' : '#FFFFFF';
+                document.body.style.color = this.darkMode ? '#FFFFFF' : '#0A0A0A';
+                localStorage.setItem('catTalkieDarkMode', this.darkMode);
+            },
+            
+            toggleTheme() {
+                this.darkMode = !this.darkMode;
+                this.applyTheme();
+                showNotification(`Switched to ${this.darkMode ? 'dark' : 'light'} mode`);
+            },
+            
+            addVideo(video) {
+                this.uploadedVideos.unshift(video);
+                this.saveVideos();
+            },
+            
+            addToHistory(videoId) {
+                if (!this.watchedVideos.includes(videoId)) {
+                    this.watchedVideos.unshift(videoId);
+                    if (this.watchedVideos.length > 50) {
+                        this.watchedVideos.pop();
+                    }
+                    this.saveHistory();
+                }
+            }
+        };
+        
+        // 🎯 DOM Elements
+        const elements = {
+            authPage: document.getElementById('authPage'),
+            authForm: document.getElementById('authForm'),
+            authTitle: document.getElementById('authTitle'),
+            authSubtitle: document.getElementById('authSubtitle'),
+            authButton: document.getElementById('authButton'),
+            authButtonText: document.getElementById('authButtonText'),
+            authToggleLink: document.getElementById('authToggleLink'),
+            authFooterText: document.getElementById('authFooterText'),
+            
+            profileCreation: document.getElementById('profileCreation'),
+            profileForm: document.getElementById('profileForm'),
+            avatarUpload: document.getElementById('avatarUpload'),
+            avatarPreview: document.getElementById('avatarPreview'),
+            avatarInitials: document.getElementById('avatarInitials'),
+            avatarImage: document.getElementById('avatarImage'),
+            avatarInput: document.getElementById('avatarInput'),
+            
+            appContainer: document.getElementById('appContainer'),
+            mainContent: document.getElementById('mainContent'),
+            videoGrid: document.getElementById('videoGrid'),
+            
+            menuToggle: document.getElementById('menuToggle'),
+            sidebar: document.getElementById('sidebar'),
+            
+            userMenuButton: document.getElementById('userMenuButton'),
+            userDropdown: document.getElementById('userDropdown'),
+            userAvatarText: document.getElementById('userAvatarText'),
+            userAvatarImage: document.getElementById('userAvatarImage'),
+            
+            videoPlayerModal: document.getElementById('videoPlayerModal'),
+            uploadModal: document.getElementById('uploadModal'),
+            notificationsModal: document.getElementById('notificationsModal'),
+            
+            videoPlayer: document.getElementById('videoPlayer'),
+            videoModalTitle: document.getElementById('videoModalTitle'),
+            
+            uploadArea: document.getElementById('uploadArea'),
+            videoFileInput: document.getElementById('videoFileInput'),
+            videoPreview: document.getElementById('videoPreview'),
+            videoPreviewPlayer: document.getElementById('videoPreviewPlayer'),
+            
+            profilePage: document.getElementById('profilePage'),
+            profileLargeAvatar: document.getElementById('profileLargeAvatar'),
+            profileAvatarText: document.getElementById('profileAvatarText'),
+            profileAvatarImage: document.getElementById('profileAvatarImage'),
+            profileNameDisplay: document.getElementById('profileNameDisplay'),
+            profileUsernameDisplay: document.getElementById('profileUsernameDisplay'),
+            profileBioDisplay: document.getElementById('profileBioDisplay'),
+            profileFollowers: document.getElementById('profileFollowers'),
+            profileFollowing: document.getElementById('profileFollowing'),
+            profileVideos: document.getElementById('profileVideos'),
+            
+            aboutPage: document.getElementById('aboutPage'),
+            settingsPage: document.getElementById('settingsPage'),
+            explorePage: document.getElementById('explorePage'),
+            trendingPage: document.getElementById('trendingPage')
+        };
+        
+        // 🎬 Enhanced Sample Data
+        const sampleVideos = [
+            {
+                id: 1,
+                title: "Funny Cat Fails Compilation 2025 😂",
+                thumbnail: "https://images.unsplash.com/photo-1514888286974-6d03bde4ba42?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80",
+                duration: "2:45",
+                views: "1.2M",
+                likes: "245K",
+                comments: "1.2K",
+                date: "2 hours ago",
+                author: "CatLover22",
+                authorInitial: "C",
+                videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+                description: "Watch these hilarious cat fails from around the world! Don't miss this epic compilation.",
+                category: "comedy",
+                tags: ["funny", "cats", "fails", "compilation"]
+            },
+            {
+                id: 2,
+                title: "Kittens Playing with Laser Pointer ⚡",
+                thumbnail: "https://images.unsplash.com/photo-1533738363-b7f9aef128ce?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80",
+                duration: "4:12",
+                views: "3.4M",
+                likes: "521K",
+                comments: "8.9K",
+                date: "1 day ago",
+                author: "KittenWorld",
+                authorInitial: "K",
+                videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+                description: "Watch these adorable kittens chase the laser pointer in this epic battle!",
+                category: "entertainment",
+                tags: ["kittens", "cute", "pets", "fun"]
+            },
+            {
+                id: 3,
+                title: "Cat Gaming Stream - Epic Plays 🎮",
+                thumbnail: "https://images.unsplash.com/photo-1518709268805-4e9042af2176?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+                duration: "15:32",
+                views: "890K",
+                likes: "124K",
+                comments: "3.4K",
+                date: "3 days ago",
+                author: "GamingCats",
+                authorInitial: "G",
+                videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4",
+                description: "Watch this cat dominate in competitive gaming! Amazing plays and reactions.",
+                category: "gaming",
+                tags: ["gaming", "esports", "stream", "cat"]
+            },
+            {
+                id: 4,
+                title: "Cat Music Video - Meow Symphony 🎵",
+                thumbnail: "https://images.unsplash.com/photo-1513360371669-4adf3dd7dff8?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+                duration: "3:21",
+                views: "5.2M",
+                likes: "890K",
+                comments: "12.4K",
+                date: "1 week ago",
+                author: "MusicPaws",
+                authorInitial: "M",
+                videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4",
+                description: "Beautiful music video featuring talented cats performing amazing melodies.",
+                category: "music",
+                tags: ["music", "cats", "melody", "performance"]
+            },
+            {
+                id: 5,
+                title: "Cat Training Tutorial - Expert Tips 🐾",
+                thumbnail: "https://images.unsplash.com/photo-1511044568932-338cba0ad803?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+                duration: "8:45",
+                views: "2.1M",
+                likes: "312K",
+                comments: "5.6K",
+                date: "2 weeks ago",
+                author: "CatTrainerPro",
+                authorInitial: "T",
+                videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+                description: "Learn expert techniques for training your cat with this comprehensive tutorial.",
+                category: "education",
+                tags: ["tutorial", "training", "pets", "education"]
+            },
+            {
+                id: 6,
+                title: "LIVE: Cat Talk Show - Special Guest 🎙️",
+                thumbnail: "https://images.unsplash.com/photo-1543852786-1cf6624b9987?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+                duration: "45:18",
+                views: "124K",
+                likes: "45K",
+                comments: "2.1K",
+                date: "LIVE",
+                author: "CatTV",
+                authorInitial: "T",
+                videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+                description: "Join our live talk show with special celebrity cat guests!",
+                category: "entertainment",
+                tags: ["live", "talk show", "celebrities", "cats"],
+                isLive: true
+            }
+        ];
+        
+        const sampleNotifications = [
+            {
+                id: 1,
+                type: 'like',
+                message: 'CatLover22 liked your video',
+                time: '2 minutes ago',
+                read: false
+            },
+            {
+                id: 2,
+                type: 'comment',
+                message: 'PetFan commented on your post',
+                time: '1 hour ago',
+                read: false
+            },
+            {
+                id: 3,
+                type: 'follow',
+                message: 'KittyMaster started following you',
+                time: '3 hours ago',
+                read: true
+            },
+            {
+                id: 4,
+                type: 'video',
+                message: 'New video from CatTV is trending',
+                time: '5 hours ago',
+                read: true
+            },
+            {
+                id: 5,
+                type: 'like',
+                message: '456 people liked your video',
+                time: '1 day ago',
+                read: true
+            }
+        ];
+        
+        // 🚀 Initialize Application
+        function initApp() {
+            AppState.init();
+            setupEventListeners();
+            checkAuthState();
+            loadVideos();
+            setupResponsive();
+            updateNotificationBadge();
+            
+            // Initialize category tabs
+            initCategoryTabs();
+        }
+        
+        // 🎮 Setup Event Listeners
+        function setupEventListeners() {
+            // Auth Form
+            elements.authForm.addEventListener('submit', handleAuthSubmit);
+            elements.authToggleLink.addEventListener('click', toggleAuthMode);
+            
+            // Profile Creation
+            elements.profileForm.addEventListener('submit', handleProfileSubmit);
+            elements.avatarUpload.addEventListener('click', () => elements.avatarInput.click());
+            elements.avatarInput.addEventListener('change', handleAvatarUpload);
+            
+            // Navigation
+            elements.menuToggle.addEventListener('click', toggleSidebar);
+            
+            document.querySelectorAll('.nav-item, .bottom-nav-item').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const page = item.getAttribute('data-page');
+                    navigateToPage(page);
+                    
+                    // Close sidebar on mobile
+                    if (window.innerWidth < 992) {
+                        elements.sidebar.classList.remove('active');
+                    }
+                });
+            });
+            
+            // User Menu
+            elements.userMenuButton.addEventListener('click', (e) => {
+                e.stopPropagation();
+                elements.userDropdown.style.display = 
+                    elements.userDropdown.style.display === 'block' ? 'none' : 'block';
+            });
+            
+            document.addEventListener('click', () => {
+                elements.userDropdown.style.display = 'none';
+            });
+            
+            // Video Upload
+            elements.uploadArea.addEventListener('click', () => elements.videoFileInput.click());
+            elements.videoFileInput.addEventListener('change', handleVideoSelect);
+            document.getElementById('uploadButton').addEventListener('click', openUploadModal);
+            document.getElementById('closeUploadModal').addEventListener('click', closeUploadModal);
+            document.getElementById('submitUploadBtn').addEventListener('click', handleVideoUpload);
+            
+            // Video Player
+            document.getElementById('closeVideoModal').addEventListener('click', closeVideoPlayer);
+            document.getElementById('likeVideoBtn').addEventListener('click', toggleLikeVideo);
+            document.getElementById('shareVideoBtn').addEventListener('click', shareCurrentVideo);
+            document.getElementById('saveVideoBtn').addEventListener('click', saveCurrentVideo);
+            document.getElementById('downloadVideoBtn').addEventListener('click', downloadCurrentVideo);
+            
+            // Video player events
+            elements.videoPlayer.addEventListener('play', () => {
+                // Track video play
+                const videoId = elements.videoPlayer.getAttribute('data-video-id');
+                if (videoId) {
+                    AppState.addToHistory(videoId);
+                }
+            });
+            
+            // Notifications
+            document.getElementById('notificationButton').addEventListener('click', openNotificationsModal);
+            document.getElementById('closeNotificationsModal').addEventListener('click', closeNotificationsModal);
+            
+            // Theme Toggle
+            document.getElementById('themeButton').addEventListener('click', () => {
+                AppState.toggleTheme();
+            });
+            
+            document.getElementById('darkModeToggle')?.addEventListener('change', (e) => {
+                AppState.darkMode = e.target.checked;
+                AppState.applyTheme();
+            });
+            
+            // Logout
+            document.getElementById('logoutButton').addEventListener('click', handleLogout);
+            
+            // Search
+            document.getElementById('globalSearch')?.addEventListener('input', handleSearch);
+            
+            // Profile Edit
+            document.getElementById('editProfileBtn')?.addEventListener('click', editProfile);
+            document.getElementById('shareProfileBtn')?.addEventListener('click', shareProfile);
+            
+            // Save Settings
+            document.getElementById('saveSettingsBtn')?.addEventListener('click', saveSettings);
+            
+            // Profile Tabs
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const tab = e.target.getAttribute('data-tab');
+                    switchProfileTab(tab);
+                });
+            });
+            
+            // Drag and drop for upload
+            elements.uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                elements.uploadArea.style.borderColor = 'var(--primary)';
+                elements.uploadArea.style.background = 'rgba(255, 51, 102, 0.1)';
+            });
+            
+            elements.uploadArea.addEventListener('dragleave', () => {
+                elements.uploadArea.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+                elements.uploadArea.style.background = 'transparent';
+            });
+            
+            elements.uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                elements.uploadArea.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+                elements.uploadArea.style.background = 'transparent';
+                
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    elements.videoFileInput.files = files;
+                    handleVideoSelect({ target: elements.videoFileInput });
+                }
+            });
+        }
+        
+        function initCategoryTabs() {
+            document.querySelectorAll('.category-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Remove active class from all tabs
+                    document.querySelectorAll('.category-tab').forEach(t => {
+                        t.classList.remove('active');
+                    });
+                    
+                    // Add active class to clicked tab
+                    this.classList.add('active');
+                    
+                    const category = this.getAttribute('data-category');
+                    filterVideosByCategory(category);
+                });
+            });
+        }
+        
+        function filterVideosByCategory(category) {
+            let filteredVideos = [...sampleVideos, ...AppState.uploadedVideos];
+            
+            if (category !== 'all') {
+                filteredVideos = filteredVideos.filter(video => 
+                    video.category === category || 
+                    (category === 'trending' && parseInt(video.views.replace(/[^0-9]/g, '')) > 1000000)
+                );
+            }
+            
+            renderVideos(filteredVideos, elements.videoGrid);
+        }
+        
+        // 🔐 Authentication Functions
+        function toggleAuthMode(e) {
+            e.preventDefault();
+            AppState.isSignUp = !AppState.isSignUp;
+            
+            if (AppState.isSignUp) {
+                elements.authTitle.textContent = 'Create Account';
+                elements.authSubtitle.textContent = 'Join the CAT TALKIE community';
+                elements.authButtonText.textContent = 'Sign Up';
+                elements.authFooterText.textContent = 'Already have an account?';
+                elements.authToggleLink.textContent = 'Sign In';
+                document.getElementById('signupFields').style.display = 'block';
+                document.getElementById('confirmPasswordGroup').style.display = 'block';
+            } else {
+                elements.authTitle.textContent = 'Welcome Back';
+                elements.authSubtitle.textContent = 'Sign in to continue to your account';
+                elements.authButtonText.textContent = 'Sign In';
+                elements.authFooterText.textContent = 'Don\'t have an account?';
+                elements.authToggleLink.textContent = 'Sign Up';
+                document.getElementById('signupFields').style.display = 'none';
+                document.getElementById('confirmPasswordGroup').style.display = 'none';
+            }
+        }
+        
+        async function handleAuthSubmit(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const fullName = document.getElementById('fullName')?.value.trim();
+            const username = document.getElementById('username')?.value.trim();
+            const confirmPassword = document.getElementById('confirmPassword')?.value.trim();
+            
+            // Validation
+            if (!email || !password) {
+                showNotification('Please fill in all required fields', 'error');
+                return;
+            }
+            
+            if (AppState.isSignUp) {
+                if (!fullName || !username || !confirmPassword) {
+                    showNotification('Please fill in all fields', 'error');
+                    return;
+                }
+                
+                if (password !== confirmPassword) {
+                    showNotification('Passwords do not match', 'error');
+                    return;
+                }
+                
+                if (password.length < 6) {
+                    showNotification('Password must be at least 6 characters', 'error');
+                    return;
+                }
+                
+                // Create user
+                const user = {
+                    id: Date.now().toString(),
+                    email: email,
+                    name: fullName,
+                    username: username.toLowerCase(),
+                    displayName: fullName,
+                    avatar: '',
+                    bio: '',
+                    followers: Math.floor(Math.random() * 100),
+                    following: Math.floor(Math.random() * 50),
+                    videos: 0,
+                    likes: 0,
+                    createdAt: new Date().toISOString()
+                };
+                
+                AppState.currentUser = user;
+                AppState.isLoggedIn = true;
+                AppState.saveUser();
+                
+                showProfileCreation();
+                showNotification('Account created successfully!', 'success');
+            } else {
+                // Sign in
+                const user = {
+                    id: Date.now().toString(),
+                    email: email,
+                    name: 'Cat Lover',
+                    username: email.split('@')[0].toLowerCase(),
+                    displayName: 'Cat Lover',
+                    avatar: '',
+                    bio: 'Cat enthusiast and video creator',
+                    followers: Math.floor(Math.random() * 1000),
+                    following: Math.floor(Math.random() * 500),
+                    videos: AppState.uploadedVideos.length,
+                    likes: Array.from(AppState.likedVideos).length,
+                    createdAt: new Date().toISOString()
+                };
+                
+                AppState.currentUser = user;
+                AppState.isLoggedIn = true;
+                AppState.saveUser();
+                
+                // Check if profile exists
+                const savedProfile = localStorage.getItem('catTalkieProfile');
+                if (savedProfile) {
+                    showMainApp();
+                } else {
+                    showProfileCreation();
+                }
+                
+                showNotification('Signed in successfully!', 'success');
+            }
+        }
+        
+        function showProfileCreation() {
+            elements.authPage.style.display = 'none';
+            elements.profileCreation.classList.add('active');
+            
+            if (AppState.currentUser) {
+                document.getElementById('profileName').value = AppState.currentUser.name || '';
+                document.getElementById('profileUsername').value = AppState.currentUser.username || '';
+                elements.avatarInitials.textContent = AppState.currentUser.name?.charAt(0) || 'U';
+            }
+        }
+        
+        function handleProfileSubmit(e) {
+            e.preventDefault();
+            
+            const displayName = document.getElementById('profileName').value.trim();
+            const username = document.getElementById('profileUsername').value.trim();
+            const bio = document.getElementById('profileBio').value.trim();
+            
+            if (!displayName || !username) {
+                showNotification('Please fill in all required fields', 'error');
+                return;
+            }
+            
+            // Update user
+            AppState.currentUser = {
+                ...AppState.currentUser,
+                displayName: displayName,
+                username: username.toLowerCase(),
+                bio: bio,
+                avatar: elements.avatarImage.src || ''
+            };
+            
+            AppState.saveProfile();
+            showMainApp();
+            showNotification('Profile completed successfully!', 'success');
+        }
+        
+        function handleAvatarUpload(e) {
+            const file = e.target.files[0];
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    elements.avatarImage.src = e.target.result;
+                    elements.avatarImage.style.display = 'block';
+                    elements.avatarInitials.style.display = 'none';
+                    
+                    // Also update user avatar if logged in
+                    if (AppState.currentUser) {
+                        AppState.currentUser.avatar = e.target.result;
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+        
+        function showMainApp() {
+            elements.authPage.style.display = 'none';
+            elements.profileCreation.classList.remove('active');
+            elements.appContainer.classList.add('active');
+            
+            // Update user info
+            updateUserInfo();
+            
+            // Load initial page
+            navigateToPage('home');
+        }
+        
+        function updateUserInfo() {
+            if (AppState.currentUser) {
+                // Update header avatar
+                elements.userAvatarText.textContent = AppState.currentUser.displayName?.charAt(0) || 'U';
+                
+                if (AppState.currentUser.avatar) {
+                    elements.userAvatarImage.src = AppState.currentUser.avatar;
+                    elements.userAvatarImage.style.display = 'block';
+                    elements.userAvatarText.style.display = 'none';
+                }
+                
+                // Update profile page if it exists
+                if (elements.profileNameDisplay) {
+                    elements.profileNameDisplay.textContent = AppState.currentUser.displayName;
+                    elements.profileUsernameDisplay.textContent = '@' + AppState.currentUser.username;
+                    elements.profileBioDisplay.textContent = AppState.currentUser.bio || 'No bio yet.';
+                    elements.profileFollowers.textContent = AppState.currentUser.followers || 0;
+                    elements.profileFollowing.textContent = AppState.currentUser.following || 0;
+                    elements.profileVideos.textContent = AppState.currentUser.videos || AppState.uploadedVideos.length;
+                    
+                    // Update analytics
+                    document.getElementById('totalViews').textContent = AppState.uploadedVideos.reduce((sum, video) => 
+                        sum + parseInt(video.views.replace(/[^0-9]/g, '') || 0), 0
+                    ).toLocaleString();
+                    
+                    document.getElementById('totalLikes').textContent = AppState.uploadedVideos.reduce((sum, video) => 
+                        sum + parseInt(video.likes.replace(/[^0-9]/g, '') || 0), 0
+                    ).toLocaleString();
+                    
+                    elements.profileAvatarText.textContent = AppState.currentUser.displayName?.charAt(0) || 'U';
+                    if (AppState.currentUser.avatar) {
+                        elements.profileAvatarImage.src = AppState.currentUser.avatar;
+                        elements.profileAvatarImage.style.display = 'block';
+                        elements.profileAvatarText.style.display = 'none';
+                    }
+                }
+            }
+        }
+        
+        function checkAuthState() {
+            if (AppState.isLoggedIn) {
+                const savedProfile = localStorage.getItem('catTalkieProfile');
+                if (savedProfile) {
+                    showMainApp();
+                } else {
+                    showProfileCreation();
+                }
+            } else {
+                elements.authPage.style.display = 'flex';
+                elements.profileCreation.classList.remove('active');
+                elements.appContainer.classList.remove('active');
+            }
+        }
+        
+        // 🎮 Navigation Functions
+        function toggleSidebar() {
+            elements.sidebar.classList.toggle('active');
+        }
+        
+        function navigateToPage(page) {
+            AppState.currentPage = page;
+            
+            // Hide all pages
+            document.querySelectorAll('.page-content').forEach(p => {
+                p.classList.remove('active');
+            });
+            
+            // Show selected page
+            const pageElement = document.getElementById(page + 'Page');
+            if (pageElement) {
+                pageElement.classList.add('active');
+            }
+            
+            // Update active navigation
+            document.querySelectorAll('.nav-item, .bottom-nav-item').forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('data-page') === page) {
+                    item.classList.add('active');
+                }
+            });
+            
+            // Load page content
+            switch(page) {
+                case 'home':
+                    loadHomePage();
+                    break;
+                case 'profile':
+                    loadProfilePage();
+                    break;
+                case 'about':
+                    loadAboutPage();
+                    break;
+                case 'settings':
+                    loadSettingsPage();
+                    break;
+                case 'explore':
+                    loadExplorePage();
+                    break;
+                case 'trending':
+                    loadTrendingPage();
+                    break;
+                case 'library':
+                    loadLibraryPage();
+                    break;
+                case 'history':
+                    loadHistoryPage();
+                    break;
+                case 'subscriptions':
+                    loadSubscriptionsPage();
+                    break;
+                case 'upload':
+                    openUploadModal();
+                    break;
+                case 'notifications':
+                    openNotificationsModal();
+                    break;
+            }
+            
+            // Update page title
+            document.title = `CAT TALKIE | ${page.charAt(0).toUpperCase() + page.slice(1)}`;
+        }
+        
+        function loadHomePage() {
+            const allVideos = [...sampleVideos, ...AppState.uploadedVideos];
+            renderVideos(allVideos, elements.videoGrid);
+        }
+        
+        function loadProfilePage() {
+            updateUserInfo();
+            renderMyVideos();
+        }
+        
+        function loadAboutPage() {
+            // About page is static HTML, just ensure it's visible
+        }
+        
+        function loadSettingsPage() {
+            if (AppState.currentUser) {
+                document.getElementById('currentEmail').textContent = AppState.currentUser.email || 'user@example.com';
+                document.getElementById('darkModeToggle').checked = AppState.darkMode;
+            }
+        }
+        
+        function loadExplorePage() {
+            renderVideos(sampleVideos, elements.exploreGrid || elements.videoGrid);
+        }
+        
+        function loadTrendingPage() {
+            const trendingVideos = [...sampleVideos]
+                .sort((a, b) => parseInt(b.views.replace(/[^0-9]/g, '')) - parseInt(a.views.replace(/[^0-9]/g, '')))
+                .slice(0, 6);
+            renderVideos(trendingVideos, elements.trendingGrid || elements.videoGrid);
+        }
+        
+        function loadLibraryPage() {
+            const savedVideoIds = Array.from(AppState.savedVideos);
+            const savedVideos = [...sampleVideos, ...AppState.uploadedVideos]
+                .filter(video => savedVideoIds.includes(video.id));
+            renderVideos(savedVideos, elements.libraryGrid || elements.videoGrid);
+        }
+        
+        function loadHistoryPage() {
+            const historyVideos = [...sampleVideos, ...AppState.uploadedVideos]
+                .filter(video => AppState.watchedVideos.includes(video.id));
+            renderVideos(historyVideos, elements.historyGrid || elements.videoGrid);
+        }
+        
+        function loadSubscriptionsPage() {
+            const subscriptionVideos = [...sampleVideos]
+                .filter(video => ['CatLover22', 'KittenWorld', 'GamingCats'].includes(video.author));
+            renderVideos(subscriptionVideos, elements.subscriptionsGrid || elements.videoGrid);
+        }
+        
+        function switchProfileTab(tab) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.style.display = 'none';
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            const tabContent = document.getElementById(tab + 'Tab');
+            if (tabContent) {
+                tabContent.style.display = 'block';
+            }
+            
+            // Add active class to clicked tab
+            document.querySelector(`.tab-button[data-tab="${tab}"]`)?.classList.add('active');
+            
+            // Load content for specific tabs
+            if (tab === 'myVideos') {
+                renderMyVideos();
+            } else if (tab === 'likedVideos') {
+                const likedVideoIds = Array.from(AppState.likedVideos);
+                const likedVideos = [...sampleVideos, ...AppState.uploadedVideos]
+                    .filter(video => likedVideoIds.includes(video.id));
+                renderVideos(likedVideos, document.getElementById('likedVideosTab') || elements.videoGrid);
+            }
+        }
+        
+        // 🎥 Video Functions
+        function loadVideos() {
+            AppState.videos = sampleVideos;
+        }
+        
+        function renderVideos(videos, container) {
+            if (!container) container = elements.videoGrid;
+            if (!container) return;
+            
+            container.innerHTML = videos.map(video => `
+                <div class="video-card" data-video-id="${video.id}">
+                    <div class="video-thumbnail">
+                        <img src="${video.thumbnail}" alt="${video.title}" 
+                             onerror="this.src='https://images.unsplash.com/photo-1514888286974-6d03bde4ba42?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80'">
+                        ${video.isLive ? '<div class="live-badge"><i class="fas fa-circle" style="font-size: 0.6rem;"></i> LIVE</div>' : ''}
+                        <div class="video-overlay">
+                            <span class="video-duration">${video.duration}</span>
+                        </div>
+                    </div>
+                    <div class="video-info">
+                        <div class="video-header">
+                            <div class="creator-avatar">${video.authorInitial || video.author?.charAt(0) || 'C'}</div>
+                            <div class="creator-info">
+                                <h4>${video.author}</h4>
+                                <p>${video.date}</p>
+                            </div>
+                        </div>
+                        <h3 class="video-title">${video.title}</h3>
+                        <div class="video-stats">
+                            <span><i class="fas fa-eye"></i> ${video.views}</span>
+                            <span><i class="fas fa-heart"></i> ${video.likes}</span>
+                            <span><i class="fas fa-comment"></i> ${video.comments}</span>
+                        </div>
+                        <div class="video-actions">
+                            <button class="video-action ${AppState.likedVideos.has(video.id) ? 'active' : ''}" 
+                                    onclick="event.stopPropagation(); toggleLike(${video.id})">
+                                <i class="${AppState.likedVideos.has(video.id) ? 'fas' : 'far'} fa-heart"></i>
+                                <span>Like</span>
+                            </button>
+                            <button class="video-action" onclick="event.stopPropagation(); playVideo(${video.id})">
+                                <i class="fas fa-play"></i>
+                                <span>Play</span>
+                            </button>
+                            <button class="video-action ${AppState.savedVideos.has(video.id) ? 'active' : ''}" 
+                                    onclick="event.stopPropagation(); toggleSave(${video.id})">
+                                <i class="${AppState.savedVideos.has(video.id) ? 'fas' : 'far'} fa-bookmark"></i>
+                                <span>Save</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            // Add click events to video cards
+            container.querySelectorAll('.video-card').forEach(card => {
+                card.addEventListener('click', (e) => {
+                    if (!e.target.closest('.video-action')) {
+                        const videoId = card.getAttribute('data-video-id');
+                        playVideo(videoId);
+                    }
+                });
+            });
+        }
+        
+        function renderMyVideos() {
+            const myVideosGrid = document.getElementById('myVideosGrid');
+            if (myVideosGrid) {
+                if (AppState.uploadedVideos.length === 0) {
+                    myVideosGrid.innerHTML = `
+                        <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px;">
+                            <i class="fas fa-video-slash" style="font-size: 3rem; color: var(--gray); margin-bottom: 20px;"></i>
+                            <h3 style="margin-bottom: 15px;">No videos yet</h3>
+                            <p style="color: var(--gray); margin-bottom: 25px;">Start sharing your amazing content!</p>
+                            <button class="btn btn-primary" onclick="openUploadModal()" style="width: auto; padding: 12px 30px;">
+                                <i class="fas fa-plus"></i> Upload First Video
+                            </button>
+                        </div>
+                    `;
+                } else {
+                    renderVideos(AppState.uploadedVideos, myVideosGrid);
+                }
+            }
+        }
+        
+        let currentVideoId = null;
+        
+        function playVideo(videoId) {
+            let video;
+            
+            // Check sample videos
+            video = sampleVideos.find(v => v.id === parseInt(videoId));
+            
+            // Check uploaded videos
+            if (!video) {
+                video = AppState.uploadedVideos.find(v => v.id == videoId);
+            }
+            
+            if (!video) return;
+            
+            currentVideoId = video.id;
+            
+            // Update modal
+            elements.videoModalTitle.textContent = video.title;
+            document.getElementById('modalCreatorName').textContent = video.author;
+            document.getElementById('modalVideoStats').textContent = `${video.views} views • ${video.date}`;
+            document.getElementById('modalVideoDescription').textContent = video.description;
+            document.getElementById('modalCreatorAvatar').textContent = video.authorInitial || video.author?.charAt(0) || 'C';
+            
+            // Update like button
+            document.getElementById('likeText').textContent = AppState.likedVideos.has(video.id) ? 'Liked' : 'Like';
+            
+            // Set video source
+            elements.videoPlayer.src = video.videoUrl;
+            elements.videoPlayer.setAttribute('data-video-id', video.id);
+            
+            // Show modal
+            elements.videoPlayerModal.classList.add('active');
+            
+            // Play video
+            setTimeout(() => {
+                elements.videoPlayer.play().catch(e => {
+                    console.log('Autoplay prevented:', e);
+                });
+            }, 300);
+        }
+        
+        function closeVideoPlayer() {
+            elements.videoPlayerModal.classList.remove('active');
+            elements.videoPlayer.pause();
+            elements.videoPlayer.currentTime = 0;
+            currentVideoId = null;
+        }
+        
+        function toggleLike(videoId) {
+            if (!AppState.currentUser) {
+                showNotification('Please sign in to like videos', 'error');
+                return;
+            }
+            
+            if (AppState.likedVideos.has(videoId)) {
+                AppState.likedVideos.delete(videoId);
+                showNotification('Removed from liked videos', 'info');
+            } else {
+                AppState.likedVideos.add(videoId);
+                showNotification('Added to liked videos', 'success');
+            }
+            
+            AppState.saveLikes();
+            
+            // Update UI if video is currently playing
+            if (currentVideoId == videoId) {
+                document.getElementById('likeText').textContent = AppState.likedVideos.has(videoId) ? 'Liked' : 'Like';
+            }
+            
+            // Update current page if needed
+            if (AppState.currentPage === 'home') {
+                loadHomePage();
+            }
+        }
+        
+        function toggleSave(videoId) {
+            if (!AppState.currentUser) {
+                showNotification('Please sign in to save videos', 'error');
+                return;
+            }
+            
+            if (AppState.savedVideos.has(videoId)) {
+                AppState.savedVideos.delete(videoId);
+                showNotification('Removed from saved videos', 'info');
+            } else {
+                AppState.savedVideos.add(videoId);
+                showNotification('Added to saved videos', 'success');
+            }
+            
+            AppState.saveSaves();
+            
+            // Update current page if needed
+            if (AppState.currentPage === 'home' || AppState.currentPage === 'library') {
+                navigateToPage(AppState.currentPage);
+            }
+        }
+        
+        function toggleLikeVideo() {
+            if (currentVideoId) {
+                toggleLike(currentVideoId);
+            }
+        }
+        
+        function saveCurrentVideo() {
+            if (currentVideoId) {
+                toggleSave(currentVideoId);
+            }
+        }
+        
+        function shareCurrentVideo() {
+            if (navigator.share) {
+                navigator.share({
+                    title: document.getElementById('videoModalTitle').textContent,
+                    text: 'Check out this amazing video on CAT TALKIE!',
+                    url: window.location.href
+                });
+            } else {
+                navigator.clipboard.writeText(window.location.href);
+                showNotification('Link copied to clipboard!', 'success');
+            }
+        }
+        
+        function downloadCurrentVideo() {
+            showNotification('Video download feature coming soon!', 'info');
+        }
+        
+        function shareVideo(videoId) {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Check out this video on CAT TALKIE',
+                    text: 'I found this amazing video on CAT TALKIE!',
+                    url: window.location.href
+                });
+            } else {
+                navigator.clipboard.writeText(window.location.href);
+                showNotification('Link copied to clipboard!', 'success');
+            }
+        }
+        
+        // 📤 Real Video Upload Functions
+        function openUploadModal() {
+            if (!AppState.currentUser) {
+                showNotification('Please sign in to upload videos', 'error');
+                navigateToPage('home');
+                return;
+            }
+            
+            elements.uploadModal.classList.add('active');
+        }
+        
+        function closeUploadModal() {
+            elements.uploadModal.classList.remove('active');
+            resetUploadForm();
+        }
+        
+        function handleVideoSelect(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            if (!file.type.startsWith('video/')) {
+                showNotification('Please select a video file', 'error');
+                return;
+            }
+            
+            if (file.size > 1073741824) { // 1GB
+                showNotification('File size must be less than 1GB', 'error');
+                return;
+            }
+            
+            // Show preview
+            const videoUrl = URL.createObjectURL(file);
+            elements.videoPreviewPlayer.src = videoUrl;
+            elements.videoPreview.style.display = 'block';
+            
+            // Auto-fill title from filename
+            const title = file.name.replace(/\.[^/.]+$/, ""); // Remove extension
+            document.getElementById('videoTitleInput').value = title;
+            
+            showNotification('Video selected successfully!', 'success');
+        }
+        
+        function handleVideoUpload() {
+            const title = document.getElementById('videoTitleInput').value.trim();
+            const description = document.getElementById('videoDescriptionInput').value.trim();
+            const tags = document.getElementById('videoTagsInput').value.trim();
+            const visibility = document.getElementById('videoVisibility').value;
+            const category = document.getElementById('videoCategory').value;
+            const videoFile = elements.videoFileInput.files[0];
+            
+            if (!videoFile) {
+                showNotification('Please select a video file first', 'error');
+                return;
+            }
+            
+            if (!title) {
+                showNotification('Please enter a video title', 'error');
+                return;
+            }
+            
+            // Create video object
+            const videoUrl = URL.createObjectURL(videoFile);
+            const newVideo = {
+                id: Date.now(),
+                title: title,
+                thumbnail: 'https://images.unsplash.com/photo-1513360371669-4adf3dd7dff8?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80',
+                duration: '1:23',
+                views: '0',
+                likes: '0',
+                comments: '0',
+                date: 'Just now',
+                author: AppState.currentUser.displayName,
+                authorInitial: AppState.currentUser.displayName?.charAt(0) || 'U',
+                videoUrl: videoUrl,
+                description: description || 'No description provided.',
+                tags: tags ? tags.split(',').map(tag => tag.trim()) : [],
+                visibility: visibility,
+                category: category
+            };
+            
+            // Add to uploaded videos
+            AppState.addVideo(newVideo);
+            
+            // Update user video count
+            AppState.currentUser.videos = AppState.uploadedVideos.length;
+            AppState.saveProfile();
+            
+            closeUploadModal();
+            showNotification('Video uploaded successfully!', 'success');
+            
+            // Update profile page if open
+            if (AppState.currentPage === 'profile') {
+                loadProfilePage();
+            }
+            
+            // Update home page if open
+            if (AppState.currentPage === 'home') {
+                loadHomePage();
+            }
+        }
+        
+        function resetUploadForm() {
+            elements.videoPreview.style.display = 'none';
+            elements.videoPreviewPlayer.src = '';
+            elements.videoFileInput.value = '';
+            document.getElementById('videoTitleInput').value = '';
+            document.getElementById('videoDescriptionInput').value = '';
+            document.getElementById('videoTagsInput').value = '';
+            document.getElementById('videoVisibility').value = 'public';
+            document.getElementById('videoCategory').value = 'entertainment';
+        }
+        
+        // 🔔 Notification Functions
+        function openNotificationsModal() {
+            elements.notificationsModal.classList.add('active');
+            renderNotifications();
+        }
+        
+        function closeNotificationsModal() {
+            elements.notificationsModal.classList.remove('active');
+        }
+        
+        function renderNotifications() {
+            const notificationsList = document.getElementById('notificationsList');
+            if (!notificationsList) return;
+            
+            notificationsList.innerHTML = sampleNotifications.map(notification => `
+                <div class="setting-item ${notification.read ? '' : 'unread'}" style="cursor: pointer; margin-bottom: 10px; background: ${notification.read ? 'rgba(255, 255, 255, 0.03)' : 'rgba(255, 51, 102, 0.1)'}">
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <div style="width: 40px; height: 40px; border-radius: 50%; background: ${notification.type === 'like' ? 'var(--primary)' : 
+                                                                                               notification.type === 'comment' ? 'var(--accent)' : 
+                                                                                               'var(--success)'}; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-${notification.type === 'like' ? 'heart' : 
+                                             notification.type === 'comment' ? 'comment' : 
+                                             'user-plus'}" style="color: white;"></i>
+                        </div>
+                        <div style="flex: 1;">
+                            <div style="font-weight: 600; margin-bottom: 5px;">${notification.message}</div>
+                            <div style="color: var(--gray); font-size: 0.9rem;">${notification.time}</div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function updateNotificationBadge() {
+            const unreadCount = sampleNotifications.filter(n => !n.read).length;
+            const badge = document.querySelector('.notification-badge');
+            if (badge) {
+                badge.textContent = unreadCount;
+                badge.style.display = unreadCount > 0 ? 'flex' : 'none';
+            }
+        }
+        
+        // ⚙️ Settings Functions
+        function saveSettings() {
+            const darkMode = document.getElementById('darkModeToggle').checked;
+            const privateAccount = document.getElementById('privateAccountToggle')?.checked || false;
+            const allowDownloads = document.getElementById('downloadToggle')?.checked || true;
+            
+            AppState.darkMode = darkMode;
+            AppState.applyTheme();
+            
+            showNotification('Settings saved successfully!', 'success');
+        }
+        
+        function editProfile() {
+            showNotification('Edit profile feature coming soon!', 'info');
+        }
+        
+        function shareProfile() {
+            if (navigator.share) {
+                navigator.share({
+                    title: `${AppState.currentUser.displayName}'s Profile`,
+                    text: `Check out ${AppState.currentUser.displayName}'s profile on CAT TALKIE!`,
+                    url: window.location.href
+                });
+            } else {
+                navigator.clipboard.writeText(window.location.href);
+                showNotification('Profile link copied to clipboard!', 'success');
+            }
+        }
+        
+        // 🔍 Search Function
+        function handleSearch(e) {
+            const query = e.target.value.toLowerCase();
+            if (query.length < 2) {
+                // Reset to all videos
+                if (AppState.currentPage === 'home') {
+                    loadHomePage();
+                }
+                return;
+            }
+            
+            // Filter videos based on search query
+            const allVideos = [...sampleVideos, ...AppState.uploadedVideos];
+            const filteredVideos = allVideos.filter(video => 
+                video.title.toLowerCase().includes(query) ||
+                video.description.toLowerCase().includes(query) ||
+                video.author.toLowerCase().includes(query) ||
+                (video.tags && video.tags.some(tag => tag.toLowerCase().includes(query))) ||
+                video.category.toLowerCase().includes(query)
+            );
+            
+            renderVideos(filteredVideos, elements.videoGrid);
+        }
+        
+        // 📱 Responsive Functions
+        function setupResponsive() {
+            handleResize();
+            window.addEventListener('resize', handleResize);
+        }
+        
+        function handleResize() {
+            const sidebar = elements.sidebar;
+            const bottomNav = document.querySelector('.bottom-nav');
+            
+            if (window.innerWidth < 992) {
+                // Mobile
+                if (sidebar) sidebar.style.transform = 'translateX(-100%)';
+                if (bottomNav) bottomNav.style.display = 'flex';
+            } else {
+                // Desktop
+                if (sidebar) sidebar.style.transform = 'translateX(0)';
+                if (bottomNav) bottomNav.style.display = 'none';
+            }
+        }
+        
+        // 👤 User Functions
+        function handleLogout() {
+            if (confirm('Are you sure you want to log out?')) {
+                AppState.currentUser = null;
+                AppState.isLoggedIn = false;
+                
+                localStorage.removeItem('catTalkieUser');
+                localStorage.removeItem('catTalkieProfile');
+                
+                elements.appContainer.classList.remove('active');
+                elements.authPage.style.display = 'flex';
+                elements.userDropdown.style.display = 'none';
+                
+                showNotification('Logged out successfully', 'info');
+            }
+        }
+        
+        // ✨ Utility Functions
+        function showNotification(message, type = 'info') {
+            // Remove existing notifications
+            const existingNotifications = document.querySelectorAll('.notification');
+            existingNotifications.forEach(n => n.remove());
+            
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-${type === 'error' ? 'exclamation-circle' : 
+                                     type === 'success' ? 'check-circle' : 
+                                     'info-circle'}" 
+                       style="color: ${type === 'error' ? 'var(--danger)' : 
+                                     type === 'success' ? 'var(--success)' : 
+                                     'var(--accent)'};"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+        
+        // Make functions globally available
+        window.toggleLike = toggleLike;
+        window.toggleSave = toggleSave;
+        window.playVideo = playVideo;
+        window.shareVideo = shareVideo;
+        window.openUploadModal = openUploadModal;
+        window.editProfile = editProfile;
+        window.navigateToPage = navigateToPage;
+        
+        // 🚀 Initialize the application
+        document.addEventListener('DOMContentLoaded', initApp);
+        
+        // Handle device orientation changes
+        window.addEventListener('orientationchange', () => {
+            setTimeout(handleResize, 100);
+        });
+        
+        // Prevent context menu on long press
+        document.addEventListener('contextmenu', (e) => {
+            if (e.target.closest('.video-card') || e.target.closest('.video-player')) {
+                e.preventDefault();
+            }
+        });
+    </script>
+</body>
+</html>
